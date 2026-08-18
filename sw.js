@@ -1,5 +1,5 @@
 // Service worker da Roleta dupla: guarda a casca do app para funcionar offline.
-const CACHE = "roleta-dupla-v1";
+const CACHE = "roleta-dupla-v2";
 const CASCA = ["./", "./index.html", "./manifest.webmanifest", "./icone.svg", "./icone-192.png", "./icone-512.png"];
 
 self.addEventListener("install", function(evento){
