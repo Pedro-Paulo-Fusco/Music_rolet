@@ -1,0 +1,17 @@
+{
+  "name": "Roleta dupla — estilo musical e país",
+  "short_name": "Roleta dupla",
+  "description": "Sorteia um estilo musical e um país, mostra o país no mapa-múndi e traz artistas reais dessa combinação.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait-primary",
+  "background_color": "#E8E5F2",
+  "theme_color": "#141414",
+  "lang": "pt-BR",
+  "icons": [
+    { "src": "icone-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any" },
+    { "src": "icone-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any" },
+    { "src": "icone.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" }
+  ]
+}
