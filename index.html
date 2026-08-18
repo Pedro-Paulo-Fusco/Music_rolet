@@ -317,12 +317,111 @@
   .cartao .links{display:flex;gap:12px;flex-wrap:wrap;margin-top:8px}
   .aviso{margin:0;font-size:14px;color:var(--painel-suave)}
 
+  .trava{
+    display:inline-flex;align-items:center;gap:6px;margin-right:auto;
+    font-family:"Instrument Sans",sans-serif;font-size:13px;font-weight:600;color:var(--texto-suave);
+    background:transparent;border:1.5px solid var(--linha);border-radius:999px;
+    padding:7px 14px;cursor:pointer;transition:background .15s ease,color .15s ease,border-color .15s ease;
+  }
+  .trava:hover{background:var(--campo-hover);color:var(--texto)}
+  .trava:focus-visible{outline:3px solid var(--destaque);outline-offset:3px}
+  .trava .cadeado{font-size:12px;filter:grayscale(1);opacity:.7}
+  .trava[aria-pressed="true"]{background:var(--destaque);color:#141414;border-color:var(--destaque)}
+  .trava[aria-pressed="true"] .cadeado{filter:none;opacity:1}
+  .barra-editar{justify-content:space-between}
+  .bancada.travada .palco{opacity:.72}
+  .bancada.travada{border-color:var(--destaque)}
+
+  .ajustes{grid-column:1/-1;border-top:1px solid var(--painel-linha);padding-top:14px;margin-top:2px;
+    display:flex;gap:16px;align-items:center;flex-wrap:wrap}
+  .ajustes .marcador{color:var(--painel-suave)}
+  .ajustes .marcador:hover{color:var(--painel-texto)}
+  .ajustes .aviso{margin-left:auto}
+
+  .abas{display:flex;gap:6px;margin-top:26px;flex-wrap:wrap}
+  .aba{
+    font-family:"Instrument Sans",sans-serif;font-size:14px;font-weight:600;color:var(--texto-suave);
+    background:transparent;border:1.5px solid var(--linha);border-radius:999px;padding:9px 18px;cursor:pointer;
+    transition:background .15s ease,color .15s ease;
+  }
+  .aba:hover{background:var(--campo-hover);color:var(--texto)}
+  .aba[aria-selected="true"]{background:var(--texto);color:var(--cartao);border-color:var(--texto)}
+  .aba:focus-visible{outline:3px solid var(--destaque);outline-offset:3px}
+
+  .painel-aba{
+    margin-top:14px;background:var(--cartao);border:1px solid var(--linha);border-radius:var(--raio);
+    box-shadow:var(--sombra);padding:20px 22px;
+  }
+  .painel-aba[hidden]{display:none}
+  .painel-aba h2{
+    font-family:"Bricolage Grotesque",sans-serif;font-size:20px;letter-spacing:-.02em;margin:0 0 4px;
+  }
+  .painel-aba .sub{color:var(--texto-suave);font-size:14px;margin:0 0 16px;max-width:64ch}
+
+  .festa-fila{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
+  .pessoa{
+    display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:600;color:var(--texto);
+    background:var(--sup);border:1px solid var(--linha);border-radius:999px;padding:6px 12px;
+  }
+  .pessoa button{border:0;background:transparent;cursor:pointer;color:var(--texto-suave);font-size:15px;line-height:1}
+  .pessoa button:hover{color:#E2574C}
+
+  .rodada{display:grid;gap:8px;margin-top:16px}
+  .turno{
+    display:flex;align-items:center;gap:12px;flex-wrap:wrap;
+    background:var(--campo-bg);border:1px solid var(--linha);border-radius:10px;padding:10px 14px;
+  }
+  .turno.ativo{border-color:var(--destaque);background:var(--campo-hover)}
+  .turno .quem{font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:16px;min-width:110px}
+  .turno .combo{font-size:14px;color:var(--texto-suave)}
+  .turno .combo b{color:var(--texto)}
+  .turno .faixa{margin-left:auto;display:flex;align-items:center;gap:10px}
+
+  .acoes-linha{display:flex;gap:10px;flex-wrap:wrap;margin-top:16px;align-items:center}
+
+  .tocar{
+    width:38px;height:38px;flex:none;border-radius:50%;border:1.5px solid var(--contorno);
+    background:var(--destaque);color:#141414;cursor:pointer;font-size:13px;line-height:1;
+    display:flex;align-items:center;justify-content:center;
+  }
+  .tocar:hover{background:var(--destaque-claro)}
+  .tocar:disabled{opacity:.35;cursor:not-allowed}
+  .tocar:focus-visible{outline:3px solid var(--destaque);outline-offset:3px}
+  .cartao .tocar{border-color:var(--painel-borda)}
+
+  .estrela{
+    border:0;background:transparent;cursor:pointer;font-size:17px;line-height:1;padding:2px 4px;
+    color:var(--painel-suave);border-radius:6px;
+  }
+  .estrela[aria-pressed="true"]{color:var(--destaque)}
+  .estrela:focus-visible{outline:2px solid var(--destaque);outline-offset:2px}
+  .cartao .topo-cartao{display:flex;align-items:flex-start;gap:8px;justify-content:space-between}
+
+  .favorito{
+    display:flex;align-items:center;gap:12px;padding:10px 14px;
+    background:var(--campo-bg);border:1px solid var(--linha);border-radius:10px;
+  }
+  .favorito img{width:44px;height:44px;border-radius:8px;object-fit:cover;flex:none;background:var(--linha)}
+  .favorito .info{min-width:0;flex:1}
+  .favorito .info b{display:block;font-family:"Bricolage Grotesque",sans-serif;font-size:16px}
+  .favorito .info span{font-size:12px;color:var(--texto-suave);font-family:"Space Mono",monospace}
+  .favorito .tirar{border:0;background:transparent;color:var(--texto-suave);cursor:pointer;font-size:16px}
+  .favorito .tirar:hover{color:#E2574C}
+
+  .lista-simples{display:grid;gap:8px;margin-top:14px}
+  .nota{font-size:13px;color:var(--texto-suave);margin:14px 0 0}
+  .config-spotify{margin-top:16px;border-top:1px solid var(--linha);padding-top:14px}
+  .config-spotify summary{cursor:pointer;font-size:13px;font-weight:600;color:var(--texto-suave)}
+  .config-spotify summary:hover{color:var(--texto)}
+  .config-spotify .fileira{margin-top:12px}
+
   footer{
     margin-top:26px;font-size:13px;color:var(--texto-suave);
     display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;
     border-top:1px solid var(--linha);padding-top:14px;
   }
   footer p{margin:0;max-width:62ch}
+  .versao{font-family:"Space Mono",monospace;font-size:11px;color:var(--texto-suave);opacity:.7}
   kbd{font-family:"Space Mono",monospace;font-size:11px;border:1px solid var(--linha);border-bottom-width:2px;border-radius:5px;padding:1px 5px;background:var(--sup);color:var(--texto)}
 
   @media (max-width:820px){
@@ -368,6 +467,12 @@
       <button class="botao" id="girarTudo">Girar as duas</button>
     </div>
 
+    <div class="ajustes">
+      <label class="marcador"><input type="checkbox" id="semRepetir"> Não repetir combinações já sorteadas</label>
+      <button class="botao fantasma" id="reiniciarFiltros">Reiniciar filtros</button>
+      <p class="aviso" id="avisoFiltros"></p>
+    </div>
+
     <div class="historico" id="historico">
       <div class="historico-topo">
         <span>Últimos sorteios</span>
@@ -403,9 +508,53 @@
     </div>
   </div>
 
+  <div class="abas" role="tablist">
+    <button class="aba" id="abaFesta" role="tab" aria-selected="false" aria-controls="painelFesta">Modo festa</button>
+    <button class="aba" id="abaFavoritos" role="tab" aria-selected="false" aria-controls="painelFavoritos">Favoritos</button>
+  </div>
+
+  <section class="painel-aba" id="painelFesta" role="tabpanel" aria-labelledby="abaFesta" hidden>
+    <h2>Modo festa</h2>
+    <p class="sub">Cada pessoa da roda ganha uma combinação própria de estilo e país. No fim, o app monta uma playlist do grupo com uma faixa para cada um.</p>
+    <div class="fileira">
+      <input class="campo" id="novaPessoa" placeholder="Nome de quem vai participar" maxlength="24">
+      <button class="botao fantasma" id="addPessoa">Adicionar</button>
+    </div>
+    <div class="festa-fila" id="filaPessoas"></div>
+    <div class="acoes-linha">
+      <button class="botao principal" id="rodarFesta" style="width:auto">Sortear para todos</button>
+      <button class="botao fantasma" id="montarPlaylist" disabled>Montar playlist do grupo</button>
+      <button class="botao fantasma" id="limparFesta">Limpar rodada</button>
+    </div>
+    <div class="rodada" id="rodada"></div>
+    <div class="acoes-linha" id="acoesFesta" hidden>
+      <button class="botao fantasma" id="festaWhats">Copiar para o WhatsApp</button>
+      <button class="botao fantasma" id="festaCsv">Baixar CSV</button>
+    </div>
+  </section>
+
+  <section class="painel-aba" id="painelFavoritos" role="tabpanel" aria-labelledby="abaFavoritos" hidden>
+    <h2>Favoritos</h2>
+    <p class="sub">Toque na estrela de qualquer artista para guardar aqui. A lista fica salva neste aparelho.</p>
+    <div class="lista-simples" id="listaFavoritos"></div>
+    <div class="acoes-linha">
+      <button class="botao fantasma" id="favWhats">Copiar para o WhatsApp</button>
+      <button class="botao fantasma" id="favCsv">Baixar CSV</button>
+      <button class="botao fantasma" id="favLimpar">Limpar favoritos</button>
+    </div>
+    <details class="config-spotify">
+      <summary>Usar o Spotify para capas e prévias (opcional)</summary>
+      <p class="nota">Sem configurar nada, as capas e as prévias de 30 segundos vêm do catálogo da Apple. Para usar o Spotify, publique o <code>worker.js</code> do pacote na Cloudflare e cole aqui o endereço gerado.</p>
+      <div class="fileira">
+        <input class="campo" id="urlWorker" placeholder="https://seu-worker.workers.dev" spellcheck="false">
+        <button class="botao fantasma" id="salvarWorker">Salvar</button>
+      </div>
+    </details>
+  </section>
+
   <footer>
     <p>Cada item é separado por uma divisória branca, e o ponteiro é desviado por ela a cada passagem. Pressione <kbd>Espaço</kbd> para girar as duas rodas.</p>
-    <p>O histórico e o tema escolhido ficam guardados neste aparelho. As listas editadas valem só nesta sessão.</p>
+    <p>O histórico e o tema escolhido ficam guardados neste aparelho. As listas editadas valem só nesta sessão.<br><span class="versao">versão 3.0 · 18/08/2026</span></p>
   </footer>
 </div>
 
@@ -492,6 +641,9 @@
         '<span>Resultado</span><strong>Gire para sortear</strong>' +
       '</div>' +
       '<div class="barra-editar">' +
+        '<button class="trava" type="button" aria-pressed="false" title="Travar esta roda no resultado atual">' +
+          '<span class="cadeado">🔒</span><span class="rotulo-trava">Travar</span>' +
+        '</button>' +
         '<button class="editar" type="button" aria-expanded="false" aria-controls="itens-' + config.indice + '">' +
           '<span class="rotulo-editar">Editar lista</span><span class="seta">▼</span>' +
         '</button>' +
@@ -522,6 +674,9 @@
     var chkTirar = raiz.querySelector(".remover-sorteado");
     var painelItens = raiz.querySelector(".itens");
     var btEditar = raiz.querySelector(".editar");
+    var btTrava = raiz.querySelector(".trava");
+
+    btTrava.addEventListener("click", function(){ api.alternarTrava(); });
     var rotuloEditar = raiz.querySelector(".rotulo-editar");
 
     btEditar.addEventListener("click", function(){
@@ -542,12 +697,27 @@
     var ultimoPino = 0;
     var tamanho = 400;
 
+    var travada = false;
+
     var api = {
       raiz: raiz,
       girar: girar,
       redesenhar: function(){ desenhar(); },
       estaGirando: function(){ return girando; },
       temItens: function(){ return itens.length >= 2; },
+      lista: function(){ return itens.slice(); },
+      indiceDe: function(valor){ return itens.indexOf(valor); },
+      estaTravada: function(){ return travada; },
+      alternarTrava: function(){
+        travada = !travada;
+        raiz.classList.toggle("travada", travada);
+        btTrava.setAttribute("aria-pressed", String(travada));
+        btTrava.querySelector(".rotulo-trava").textContent = travada ? "Travada" : "Travar";
+        btGirar.disabled = travada || itens.length < 2 || girando;
+        if(config.aoTravar) config.aoTravar();
+        return travada;
+      },
+      destravar: function(){ if(travada) api.alternarTrava(); },
       ultimo: null
     };
 
@@ -669,15 +839,27 @@
       if(chegou){ void painel.offsetWidth; painel.classList.add("chegou"); }
     }
 
-    function girar(){
+    function girar(alvo, rapido){
       if(girando || itens.length < 2) return Promise.resolve(null);
       girando = true;
       btGirar.disabled = true;
       mostrar("Girando…", false);
 
-      var duracao = menosMovimento ? 900 : 4200 + Math.random() * 1600;
+      var base = rapido ? 1500 : 4200;
+      var extra = rapido ? 400 : 1600;
+      var duracao = menosMovimento ? 700 : base + Math.random() * extra;
       var inicio = rotacao;
-      var volta = TAU * (menosMovimento ? 1.5 : 5 + Math.random() * 3) + Math.random() * TAU;
+      var giros = menosMovimento ? 1.5 : (rapido ? 2 : 5) + Math.random() * (rapido ? 1 : 3);
+      var volta;
+      if(typeof alvo === "number" && alvo >= 0 && alvo < itens.length){
+        // faz a roda parar exatamente no item pedido
+        var fatia = TAU / itens.length;
+        var destino = -(alvo * fatia + fatia * (0.2 + Math.random() * 0.6));
+        var delta = ((destino - inicio) % TAU + TAU) % TAU;
+        volta = delta + TAU * Math.round(giros);
+      }else{
+        volta = TAU * giros + Math.random() * TAU;
+      }
       var t0 = performance.now();
       var anterior = inicio;
 
@@ -704,7 +886,7 @@
               itens.splice(i, 1);
               renderizarItens();
             }
-            btGirar.disabled = itens.length < 2;
+            btGirar.disabled = travada || itens.length < 2;
             resolve(vencedor);
           }
         }
@@ -734,7 +916,7 @@
         fichas.appendChild(ficha);
       });
       contador.textContent = itens.length;
-      btGirar.disabled = itens.length < 2 || girando;
+      btGirar.disabled = travada || itens.length < 2 || girando;
       if(itens.length < 2 && !girando) mostrar("Adicione pelo menos 2 itens", false);
       desenhar();
       if(config.aoMudar) config.aoMudar();
@@ -755,8 +937,9 @@
 
     btAdd.addEventListener("click", adicionar);
     campo.addEventListener("keydown", function(e){ if(e.key === "Enter"){ e.preventDefault(); adicionar(); } });
-    btGirar.addEventListener("click", girar);
-    canvas.addEventListener("click", girar);
+    function girarLivre(){ if(!travada) girar(); }
+    btGirar.addEventListener("click", girarLivre);
+    canvas.addEventListener("click", girarLivre);
     btReset.addEventListener("click", function(){
       if(girando) return;
       itens = config.itens.slice();
@@ -1136,9 +1319,36 @@
     var corpo = document.createElement("div");
     corpo.className = "corpo";
 
+    var topo = document.createElement("div");
+    topo.className = "topo-cartao";
     var nome = document.createElement("b");
     nome.textContent = artista.name;
-    corpo.appendChild(nome);
+    topo.appendChild(nome);
+
+    var estrela = document.createElement("button");
+    estrela.className = "estrela";
+    estrela.type = "button";
+    estrela.title = "Guardar nos favoritos";
+    var contexto = consultaAtual() || { estilo: estilo, pais: b.ultimo || "" };
+    function pintarEstrela(){
+      var salvo = ehFavorito(artista.name);
+      estrela.textContent = salvo ? "★" : "☆";
+      estrela.setAttribute("aria-pressed", String(salvo));
+    }
+    estrela.addEventListener("click", function(){
+      alternarFavorito({
+        nome: artista.name,
+        estilo: contexto.estilo,
+        pais: contexto.pais,
+        mb: artista.id,
+        capa: cartao.dataset.capa || "",
+        faixa: cartao.dataset.faixa || ""
+      });
+      pintarEstrela();
+    });
+    pintarEstrela();
+    topo.appendChild(estrela);
+    corpo.appendChild(topo);
 
     var partes = [];
     if(artista.type) partes.push(artista.type === "Group" ? "Banda" : artista.type === "Person" ? "Artista" : artista.type);
@@ -1183,17 +1393,36 @@
 
     cartao.appendChild(corpo);
 
-    // enriquece com foto e resumo da Wikipédia
+    // capa do álbum e prévia de 30 segundos
+    buscarMidia(artista.name).then(function(midia){
+      if(!midia) return;
+      cartao.dataset.faixa = midia.faixa || "";
+      if(midia.capa){
+        cartao.dataset.capa = midia.capa;
+        var capa = document.createElement("img");
+        capa.className = "foto";
+        capa.src = midia.capa;
+        capa.alt = "Capa de " + (midia.faixa || artista.name);
+        capa.loading = "lazy";
+        if(cartao.firstChild === vaga) cartao.replaceChild(capa, vaga);
+      }
+      if(midia.previa){
+        var bt = botaoTocar(midia.previa, artista.name + " — " + (midia.faixa || ""));
+        links.insertBefore(bt, links.firstChild);
+      }
+    });
+
+    // enriquece com resumo da Wikipédia
     perfilDoArtista(artista.name).then(function(perfil){
       if(!perfil) return;
       if(perfil.resumo) resumo.textContent = perfil.resumo;
-      if(perfil.foto){
+      if(perfil.foto && cartao.firstChild === vaga){
         var img = document.createElement("img");
         img.className = "foto";
         img.src = perfil.foto;
         img.alt = artista.name;
         img.loading = "lazy";
-        img.onerror = function(){ img.replaceWith(vaga); };
+        img.onerror = function(){ if(img.parentNode) img.replaceWith(vaga); };
         cartao.replaceChild(img, vaga);
       }
       if(perfil.link) link("Wikipédia", perfil.link);
@@ -1238,6 +1467,490 @@
   btIA.addEventListener("click", buscarArtistas);
   carregarHistorico();
 
+  // ================= filtros de sorteio =================
+  var CHAVE_USADAS = "roleta-dupla:usadas";
+  var semRepetir = document.getElementById("semRepetir");
+  var btReiniciarFiltros = document.getElementById("reiniciarFiltros");
+  var avisoFiltros = document.getElementById("avisoFiltros");
+  var usadas = {};
+
+  function mostrarAvisoFiltro(texto){ avisoFiltros.textContent = texto; }
+
+  function salvarUsadas(){
+    var chaves = Object.keys(usadas).slice(-400);
+    var enxuto = {};
+    chaves.forEach(function(k){ enxuto[k] = true; });
+    usadas = enxuto;
+    deposito.gravar(CHAVE_USADAS, JSON.stringify(chaves));
+  }
+
+  (function carregarUsadas(){
+    try{
+      var bruto = deposito.ler(CHAVE_USADAS);
+      (bruto ? JSON.parse(bruto) : []).forEach(function(k){ usadas[k] = true; });
+    }catch(e){ usadas = {}; }
+  })();
+
+  btReiniciarFiltros.addEventListener("click", function(){
+    usadas = {};
+    salvarUsadas();
+    semRepetir.checked = false;
+    a.destravar(); b.destravar();
+    mostrarAvisoFiltro("Filtros reiniciados: todas as combinações voltaram a valer.");
+    setTimeout(function(){ mostrarAvisoFiltro(""); }, 4000);
+  });
+
+  // ================= capas e prévias de 30 segundos =================
+  var CHAVE_WORKER = "roleta-dupla:worker";
+  var urlWorker = deposito.ler(CHAVE_WORKER) || "";
+  var campoWorker = document.getElementById("urlWorker");
+  var btSalvarWorker = document.getElementById("salvarWorker");
+  campoWorker.value = urlWorker;
+  btSalvarWorker.addEventListener("click", function(){
+    urlWorker = campoWorker.value.trim().replace(/\/$/, "");
+    deposito.gravar(CHAVE_WORKER, urlWorker);
+    btSalvarWorker.textContent = urlWorker ? "Salvo" : "Removido";
+    setTimeout(function(){ btSalvarWorker.textContent = "Salvar"; }, 2000);
+  });
+
+  var cacheMidia = {};
+
+  function itunesJSONP(termo){
+    // a busca da Apple não libera CORS, mas aceita JSONP
+    return new Promise(function(resolve){
+      var nome = "itunes_" + Math.random().toString(36).slice(2);
+      var script = document.createElement("script");
+      var limpar = function(){
+        delete window[nome];
+        if(script.parentNode) script.parentNode.removeChild(script);
+      };
+      var tempo = setTimeout(function(){ limpar(); resolve(null); }, 6000);
+      window[nome] = function(dados){ clearTimeout(tempo); limpar(); resolve(dados); };
+      script.src = "https://itunes.apple.com/search?media=music&entity=song&limit=1&term=" +
+                   encodeURIComponent(termo) + "&callback=" + nome;
+      script.onerror = function(){ clearTimeout(tempo); limpar(); resolve(null); };
+      document.head.appendChild(script);
+    });
+  }
+
+  function midiaSpotify(nome){
+    if(!urlWorker) return Promise.resolve(null);
+    return fetch(urlWorker + "/artista?nome=" + encodeURIComponent(nome))
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        if(!d || !d.nome) return null;
+        return { capa: d.capa || "", previa: d.previa || "", faixa: d.faixa || "", fonte: "Spotify" };
+      })
+      .catch(function(){ return null; });
+  }
+
+  function buscarMidia(nome){
+    if(cacheMidia[nome]) return Promise.resolve(cacheMidia[nome]);
+    return midiaSpotify(nome).then(function(sp){
+      if(sp && (sp.capa || sp.previa)){ cacheMidia[nome] = sp; return sp; }
+      return itunesJSONP(nome).then(function(d){
+        var r = (d && d.results && d.results[0]) || null;
+        if(!r) return null;
+        var midia = {
+          capa: (r.artworkUrl100 || "").replace("100x100", "300x300"),
+          previa: r.previewUrl || "",
+          faixa: r.trackName || "",
+          fonte: "Apple Music"
+        };
+        cacheMidia[nome] = midia;
+        return midia;
+      });
+    });
+  }
+
+  // tocador único: só uma prévia por vez
+  var tocador = new Audio();
+  tocador.preload = "none";
+  var botaoTocando = null;
+
+  function pararPrevia(){
+    tocador.pause();
+    if(botaoTocando){ botaoTocando.textContent = "▶"; botaoTocando = null; }
+  }
+  tocador.addEventListener("ended", pararPrevia);
+
+  function botaoTocar(url, titulo){
+    var bt = document.createElement("button");
+    bt.className = "tocar";
+    bt.type = "button";
+    bt.textContent = "▶";
+    bt.title = "Ouvir 30 segundos de " + titulo;
+    bt.addEventListener("click", function(){
+      if(botaoTocando === bt){ pararPrevia(); return; }
+      pararPrevia();
+      tocador.src = url;
+      tocador.currentTime = 0;
+      tocador.play().then(function(){
+        bt.textContent = "❚❚";
+        botaoTocando = bt;
+      }).catch(function(){ bt.disabled = true; bt.title = "Prévia indisponível"; });
+    });
+    return bt;
+  }
+
+  // ================= favoritos =================
+  var CHAVE_FAVORITOS = "roleta-dupla:favoritos";
+  var favoritos = [];
+  var listaFavoritos = document.getElementById("listaFavoritos");
+
+  function carregarFavoritos(){
+    try{
+      var bruto = deposito.ler(CHAVE_FAVORITOS);
+      favoritos = bruto ? JSON.parse(bruto) : [];
+      if(!Array.isArray(favoritos)) favoritos = [];
+    }catch(e){ favoritos = []; }
+    desenharFavoritos();
+  }
+
+  function salvarFavoritos(){
+    deposito.gravar(CHAVE_FAVORITOS, JSON.stringify(favoritos.slice(0, 200)));
+  }
+
+  function ehFavorito(nome){
+    return favoritos.some(function(f){ return f.nome === nome; });
+  }
+
+  function alternarFavorito(item){
+    var i = favoritos.findIndex(function(f){ return f.nome === item.nome; });
+    if(i >= 0) favoritos.splice(i, 1);
+    else favoritos.unshift(Object.assign({ quando: Date.now() }, item));
+    salvarFavoritos();
+    desenharFavoritos();
+  }
+
+  function desenharFavoritos(){
+    listaFavoritos.innerHTML = "";
+    if(!favoritos.length){
+      var p = document.createElement("p");
+      p.className = "nota";
+      p.textContent = "Nenhum favorito ainda. Toque na estrela de um artista para guardá-lo aqui.";
+      listaFavoritos.appendChild(p);
+      return;
+    }
+    favoritos.forEach(function(f){
+      var linha = document.createElement("div");
+      linha.className = "favorito";
+
+      if(f.capa){
+        var img = document.createElement("img");
+        img.src = f.capa; img.alt = f.nome; img.loading = "lazy";
+        linha.appendChild(img);
+      }
+
+      var info = document.createElement("div");
+      info.className = "info";
+      var nome = document.createElement("b");
+      nome.textContent = f.nome;
+      var meta = document.createElement("span");
+      meta.textContent = [f.estilo, f.pais].filter(Boolean).join(" · ");
+      info.appendChild(nome); info.appendChild(meta);
+      linha.appendChild(info);
+
+      var ouvir = document.createElement("a");
+      ouvir.href = "https://open.spotify.com/search/" + encodeURIComponent(f.nome);
+      ouvir.target = "_blank"; ouvir.rel = "noopener noreferrer";
+      ouvir.textContent = "Ouvir";
+      ouvir.style.cssText = "color:var(--destaque);font-size:13px;font-weight:600;text-decoration:none";
+      linha.appendChild(ouvir);
+
+      var tirar = document.createElement("button");
+      tirar.className = "tirar"; tirar.type = "button"; tirar.textContent = "×";
+      tirar.setAttribute("aria-label", "Remover " + f.nome);
+      tirar.addEventListener("click", function(){ alternarFavorito({ nome: f.nome }); });
+      linha.appendChild(tirar);
+
+      listaFavoritos.appendChild(linha);
+    });
+  }
+
+  // ================= exportação =================
+  function baixar(nomeArquivo, conteudo, tipo){
+    var blob = new Blob(["\ufeff" + conteudo], { type: tipo + ";charset=utf-8" });
+    var url = URL.createObjectURL(blob);
+    var link = document.createElement("a");
+    link.href = url; link.download = nomeArquivo;
+    document.body.appendChild(link); link.click();
+    document.body.removeChild(link);
+    setTimeout(function(){ URL.revokeObjectURL(url); }, 1000);
+  }
+
+  function csv(linhas){
+    return linhas.map(function(linha){
+      return linha.map(function(celula){
+        var t = String(celula == null ? "" : celula);
+        return '"' + t.replace(/"/g, '""') + '"';
+      }).join(";");
+    }).join("\r\n");
+  }
+
+  function copiarTexto(texto, botao){
+    var rotulo = botao.textContent;
+    function fim(ok){
+      botao.textContent = ok ? "Copiado!" : "Não deu para copiar";
+      setTimeout(function(){ botao.textContent = rotulo; }, 2200);
+    }
+    if(navigator.clipboard && navigator.clipboard.writeText){
+      navigator.clipboard.writeText(texto).then(function(){ fim(true); }).catch(function(){ fim(false); });
+    }else{
+      var area = document.createElement("textarea");
+      area.value = texto; document.body.appendChild(area); area.select();
+      try{ document.execCommand("copy"); fim(true); }catch(e){ fim(false); }
+      document.body.removeChild(area);
+    }
+  }
+
+  document.getElementById("favWhats").addEventListener("click", function(){
+    if(!favoritos.length) return;
+    var linhas = ["🎧 *Descobertas na Roleta dupla*", ""];
+    favoritos.forEach(function(f){
+      linhas.push("• *" + f.nome + "* — " + [f.estilo, f.pais].filter(Boolean).join(" · "));
+      if(f.faixa) linhas.push("   ↳ " + f.faixa);
+    });
+    linhas.push("", "Sorteado em roleta dupla de estilo musical e país.");
+    copiarTexto(linhas.join("\n"), this);
+  });
+
+  document.getElementById("favCsv").addEventListener("click", function(){
+    if(!favoritos.length) return;
+    var linhas = [["Artista", "Estilo", "País", "Faixa", "Salvo em"]];
+    favoritos.forEach(function(f){
+      linhas.push([f.nome, f.estilo || "", f.pais || "", f.faixa || "", new Date(f.quando || Date.now()).toLocaleString("pt-BR")]);
+    });
+    baixar("favoritos-roleta-dupla.csv", csv(linhas), "text/csv");
+  });
+
+  document.getElementById("favLimpar").addEventListener("click", function(){
+    favoritos = []; salvarFavoritos(); desenharFavoritos();
+  });
+
+  // ================= modo festa =================
+  var CHAVE_PESSOAS = "roleta-dupla:pessoas";
+  var pessoas = [];
+  var rodada = [];
+  var filaPessoas = document.getElementById("filaPessoas");
+  var painelRodada = document.getElementById("rodada");
+  var btRodar = document.getElementById("rodarFesta");
+  var btPlaylist = document.getElementById("montarPlaylist");
+  var acoesFesta = document.getElementById("acoesFesta");
+
+  try{
+    var brutoP = deposito.ler(CHAVE_PESSOAS);
+    pessoas = brutoP ? JSON.parse(brutoP) : [];
+    if(!Array.isArray(pessoas)) pessoas = [];
+  }catch(e){ pessoas = []; }
+
+  function salvarPessoas(){ deposito.gravar(CHAVE_PESSOAS, JSON.stringify(pessoas)); }
+
+  function desenharPessoas(){
+    filaPessoas.innerHTML = "";
+    if(!pessoas.length){
+      var p = document.createElement("p");
+      p.className = "nota";
+      p.textContent = "Adicione pelo menos duas pessoas para começar a rodada.";
+      filaPessoas.appendChild(p);
+      return;
+    }
+    pessoas.forEach(function(nome, i){
+      var ficha = document.createElement("span");
+      ficha.className = "pessoa";
+      ficha.appendChild(document.createTextNode(nome));
+      var x = document.createElement("button");
+      x.type = "button"; x.textContent = "×";
+      x.setAttribute("aria-label", "Remover " + nome);
+      x.addEventListener("click", function(){
+        pessoas.splice(i, 1); salvarPessoas(); desenharPessoas();
+      });
+      ficha.appendChild(x);
+      filaPessoas.appendChild(ficha);
+    });
+  }
+
+  function adicionarPessoa(){
+    var campo = document.getElementById("novaPessoa");
+    var nome = campo.value.trim();
+    if(!nome || pessoas.length >= 20) return;
+    pessoas.push(nome);
+    campo.value = ""; campo.focus();
+    salvarPessoas(); desenharPessoas();
+  }
+
+  document.getElementById("addPessoa").addEventListener("click", adicionarPessoa);
+  document.getElementById("novaPessoa").addEventListener("keydown", function(e){
+    if(e.key === "Enter"){ e.preventDefault(); adicionarPessoa(); }
+  });
+
+  function desenharRodada(){
+    painelRodada.innerHTML = "";
+    rodada.forEach(function(turno, i){
+      var linha = document.createElement("div");
+      linha.className = "turno" + (turno.ativo ? " ativo" : "");
+
+      var quem = document.createElement("span");
+      quem.className = "quem";
+      quem.textContent = turno.nome;
+      linha.appendChild(quem);
+
+      var combo = document.createElement("span");
+      combo.className = "combo";
+      if(turno.estilo){
+        combo.innerHTML = "";
+        var f1 = document.createElement("b"); f1.textContent = turno.estilo;
+        var f2 = document.createElement("b"); f2.textContent = turno.pais;
+        combo.appendChild(f1);
+        combo.appendChild(document.createTextNode(" em "));
+        combo.appendChild(f2);
+      }else{
+        combo.textContent = turno.ativo ? "girando…" : "aguardando";
+      }
+      linha.appendChild(combo);
+
+      if(turno.artista){
+        var faixa = document.createElement("span");
+        faixa.className = "faixa";
+        var texto = document.createElement("span");
+        texto.style.cssText = "font-size:13px";
+        texto.textContent = turno.artista + (turno.faixa ? " — " + turno.faixa : "");
+        faixa.appendChild(texto);
+        if(turno.previa) faixa.appendChild(botaoTocar(turno.previa, turno.artista));
+        linha.appendChild(faixa);
+      }
+
+      painelRodada.appendChild(linha);
+    });
+  }
+
+  function rodarFesta(){
+    if(pessoas.length < 1){ return; }
+    if(a.estaGirando() || b.estaGirando()) return;
+    btRodar.disabled = true;
+    btPlaylist.disabled = true;
+    acoesFesta.hidden = true;
+    rodada = pessoas.map(function(nome){ return { nome: nome }; });
+    desenharRodada();
+
+    var i = 0;
+    function proximo(){
+      if(i >= rodada.length){
+        btRodar.disabled = false;
+        btPlaylist.disabled = false;
+        return;
+      }
+      rodada.forEach(function(t){ t.ativo = false; });
+      rodada[i].ativo = true;
+      desenharRodada();
+      girarTudo(true).then(function(res){
+        rodada[i].ativo = false;
+        if(res && res.estilo){
+          rodada[i].estilo = res.estilo;
+          rodada[i].pais = res.pais;
+        }else{
+          rodada[i].estilo = "—"; rodada[i].pais = "sem combinação livre";
+        }
+        desenharRodada();
+        i++;
+        setTimeout(proximo, 350);
+      });
+    }
+    proximo();
+  }
+
+  btRodar.addEventListener("click", rodarFesta);
+
+  document.getElementById("limparFesta").addEventListener("click", function(){
+    rodada = []; desenharRodada(); acoesFesta.hidden = true; btPlaylist.disabled = true;
+  });
+
+  function artistaPara(estilo, pais){
+    var cod = codigoDoPais(pais);
+    var consulta = 'tag:"' + tagDoEstilo(estilo) + '"' + (cod ? ' AND country:' + cod.toUpperCase() : '');
+    return fetch("https://musicbrainz.org/ws/2/artist?query=" + encodeURIComponent(consulta) + "&fmt=json&limit=5")
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var lista = (d && d.artists) || [];
+        if(!lista.length) return null;
+        return lista[Math.floor(Math.random() * Math.min(3, lista.length))].name;
+      })
+      .catch(function(){ return null; });
+  }
+
+  function montarPlaylist(){
+    var validos = rodada.filter(function(t){ return t.estilo && t.estilo !== "—"; });
+    if(!validos.length) return;
+    btPlaylist.disabled = true;
+    btPlaylist.textContent = "Montando…";
+
+    var fila = validos.slice();
+    function proximo(){
+      if(!fila.length){
+        btPlaylist.disabled = false;
+        btPlaylist.textContent = "Montar playlist do grupo";
+        acoesFesta.hidden = false;
+        return;
+      }
+      var turno = fila.shift();
+      artistaPara(turno.estilo, turno.pais).then(function(nome){
+        if(!nome){ turno.artista = "nada encontrado"; desenharRodada(); return null; }
+        turno.artista = nome;
+        desenharRodada();
+        return buscarMidia(nome).then(function(m){
+          if(m){ turno.faixa = m.faixa; turno.previa = m.previa; turno.capa = m.capa; }
+          desenharRodada();
+        });
+      }).then(function(){
+        setTimeout(proximo, 1100);   // respeita o limite de 1 consulta por segundo do MusicBrainz
+      });
+    }
+    proximo();
+  }
+
+  btPlaylist.addEventListener("click", montarPlaylist);
+
+  document.getElementById("festaWhats").addEventListener("click", function(){
+    var linhas = ["🎉 *Playlist da roda*", ""];
+    rodada.forEach(function(t){
+      if(!t.estilo || t.estilo === "—") return;
+      linhas.push("• *" + t.nome + "*: " + t.estilo + " · " + t.pais);
+      if(t.artista) linhas.push("   ↳ " + t.artista + (t.faixa ? " — " + t.faixa : ""));
+    });
+    linhas.push("", "Sorteado na Roleta dupla.");
+    copiarTexto(linhas.join("\n"), this);
+  });
+
+  document.getElementById("festaCsv").addEventListener("click", function(){
+    var linhas = [["Pessoa", "Estilo", "País", "Artista", "Faixa"]];
+    rodada.forEach(function(t){
+      if(!t.estilo || t.estilo === "—") return;
+      linhas.push([t.nome, t.estilo, t.pais, t.artista || "", t.faixa || ""]);
+    });
+    baixar("playlist-da-roda.csv", csv(linhas), "text/csv");
+  });
+
+  // ================= abas =================
+  function ligarAba(idAba, idPainel){
+    var aba = document.getElementById(idAba);
+    var painel = document.getElementById(idPainel);
+    aba.addEventListener("click", function(){
+      var abrindo = painel.hidden;
+      [["abaFesta","painelFesta"],["abaFavoritos","painelFavoritos"]].forEach(function(par){
+        document.getElementById(par[1]).hidden = true;
+        document.getElementById(par[0]).setAttribute("aria-selected", "false");
+      });
+      painel.hidden = !abrindo;
+      aba.setAttribute("aria-selected", String(abrindo));
+      if(abrindo) painel.scrollIntoView({ behavior: menosMovimento ? "auto" : "smooth", block: "nearest" });
+    });
+  }
+  ligarAba("abaFesta", "painelFesta");
+  ligarAba("abaFavoritos", "painelFavoritos");
+
+  desenharPessoas();
+  carregarFavoritos();
+
   // ---------- modo noturno ----------
   var CHAVE_TEMA = "roleta-dupla:tema";
   var btTema = document.getElementById("tema");
@@ -1268,20 +1981,81 @@
 
   // funciona offline quando o app estiver hospedado (ignorado se aberto como arquivo local)
   if("serviceWorker" in navigator && location.protocol.indexOf("http") === 0){
-    navigator.serviceWorker.register("sw.js").catch(function(){});
+    navigator.serviceWorker.register("sw.js").then(function(reg){
+      reg.update();
+      reg.addEventListener("updatefound", function(){
+        var novo = reg.installing;
+        if(!novo) return;
+        novo.addEventListener("statechange", function(){
+          if(novo.state === "installed" && navigator.serviceWorker.controller){
+            var barra = document.createElement("button");
+            barra.className = "botao";
+            barra.style.cssText = "position:fixed;left:50%;bottom:18px;transform:translateX(-50%);z-index:99";
+            barra.textContent = "Nova versão disponível — atualizar";
+            barra.addEventListener("click", function(){ location.reload(); });
+            document.body.appendChild(barra);
+          }
+        });
+      });
+    }).catch(function(){});
   }
 
-  function girarTudo(){
-    if(a.estaGirando() || b.estaGirando()) return;
-    if(!a.temItens() && !b.temItens()) return;
+  function chave(estilo, pais){ return estilo + " || " + pais; }
+
+  function sortearCombinacao(){
+    // devolve {iEstilo, iPais} respeitando travas e o filtro de repetição
+    var estilos = a.lista(), paises = b.lista();
+    var fixoA = a.estaTravada() && a.ultimo ? a.indiceDe(a.ultimo) : -1;
+    var fixoB = b.estaTravada() && b.ultimo ? b.indiceDe(b.ultimo) : -1;
+    var candidatos = [];
+    for(var i = 0; i < estilos.length; i++){
+      if(fixoA >= 0 && i !== fixoA) continue;
+      for(var j = 0; j < paises.length; j++){
+        if(fixoB >= 0 && j !== fixoB) continue;
+        if(semRepetir.checked && usadas[chave(estilos[i], paises[j])]) continue;
+        candidatos.push([i, j]);
+      }
+    }
+    if(!candidatos.length) return null;
+    var escolha = candidatos[Math.floor(Math.random() * candidatos.length)];
+    return { iEstilo: escolha[0], iPais: escolha[1] };
+  }
+
+  function girarTudo(rapido){
+    if(a.estaGirando() || b.estaGirando()) return Promise.resolve(null);
+    if(!a.temItens() && !b.temItens()) return Promise.resolve(null);
+    // travar só vale depois que a roda já tem um resultado para segurar
+    var travaA = a.estaTravada() && !!a.ultimo;
+    var travaB = b.estaTravada() && !!b.ultimo;
+    if(travaA && travaB){
+      mostrarAvisoFiltro("As duas rodas estão travadas. Destrave uma para sortear.");
+      return Promise.resolve(null);
+    }
+
+    var combo = sortearCombinacao();
+    if(!combo){
+      mostrarAvisoFiltro("Todas as combinações possíveis já saíram. Use “Reiniciar filtros”.");
+      return Promise.resolve(null);
+    }
+    mostrarAvisoFiltro("");
+
     btTudo.disabled = true;
-    Promise.all([a.girar(), b.girar()]).then(function(){
+    var giros = [];
+    giros.push(travaA ? Promise.resolve(a.ultimo) : a.girar(combo.iEstilo, rapido === true));
+    giros.push(travaB ? Promise.resolve(b.ultimo) : b.girar(combo.iPais, rapido === true));
+
+    return Promise.all(giros).then(function(){
       btTudo.disabled = false;
       atualizarPar();
+      if(a.ultimo && b.ultimo){
+        usadas[chave(a.ultimo, b.ultimo)] = true;
+        salvarUsadas();
+      }
+      return { estilo: a.ultimo, pais: b.ultimo };
     });
   }
 
-  btTudo.addEventListener("click", girarTudo);
+  btTudo.addEventListener("click", function(){ pararPrevia(); girarTudo(); });
 
   btSom.addEventListener("click", function(){
     somLigado = !somLigado;
