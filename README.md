@@ -12,16 +12,6 @@ dessa combinação, com foto, resumo e links para ouvir.
 | `sw.js` | Service worker: guarda o app para abrir offline |
 | `icone.svg`, `icone-192.png`, `icone-512.png` | Ícones do app |
 
-## Como publicar no GitHub Pages
-
-1. Crie um repositório e envie estes arquivos na raiz.
-2. Em **Settings → Pages**, escolha a branch `main` e a pasta `/ (root)`.
-3. Abra o endereço gerado. No celular, use "Adicionar à tela de início";
-   no Chrome do computador, o ícone de instalar aparece na barra de endereço.
-
-O service worker só funciona em `https` (ou `localhost`). Abrindo o `index.html`
-direto do disco, o app continua funcionando — só não instala nem guarda offline.
-
 ## O que vem de onde
 
 - **Mapa-múndi**: contornos vetoriais embutidos no próprio HTML, sem rede.
