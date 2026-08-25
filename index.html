@@ -205,6 +205,9 @@
   .campo::placeholder{color:var(--texto-suave);opacity:.7}
   .campo:focus{outline:none;border-color:var(--destaque);background:var(--sup)}
 
+  .fileira.conjuntos{margin-bottom:10px}
+  select.campo{cursor:pointer;appearance:none;background-image:none}
+
   .fichas{display:flex;flex-wrap:wrap;gap:7px;margin-top:12px}
   .ficha{
     display:inline-flex;align-items:center;gap:7px;font-size:13px;font-weight:500;color:var(--texto);
@@ -338,6 +341,16 @@
   .ajustes .marcador:hover{color:var(--painel-texto)}
   .ajustes .aviso{margin-left:auto}
 
+  .alerta-vazia{
+    grid-column:1/-1;display:flex;align-items:center;gap:14px;flex-wrap:wrap;
+    background:rgba(226,87,76,.14);border:1px solid rgba(226,87,76,.5);
+    border-radius:10px;padding:12px 16px;margin-top:14px;
+  }
+  .alerta-vazia[hidden]{display:none}
+  .alerta-vazia p{margin:0;font-size:14px;color:var(--painel-texto);flex:1;min-width:220px}
+  .alerta-vazia b{color:var(--destaque)}
+  .alerta-vazia .botao{flex:none}
+
   .abas{display:flex;gap:6px;margin-top:26px;flex-wrap:wrap}
   .aba{
     font-family:"Instrument Sans",sans-serif;font-size:14px;font-weight:600;color:var(--texto-suave);
@@ -452,7 +465,7 @@
         <span id="temaTexto">Modo noturno</span>
       </button>
     </div>
-    <p class="linha-fina">A roda da esquerda sorteia um estilo musical, a da direita sorteia um país. Gire uma de cada vez ou as duas juntas — o ponteiro bate em cada divisória até parar no item sorteado.</p>
+    <p class="linha-fina">São 122 estilos e 138 países no catálogo, organizados em conjuntos que você troca dentro de cada roda. Gire uma de cada vez ou as duas juntas — o ponteiro bate em cada divisória até parar no item sorteado.</p>
   </header>
 
   <div class="mesa" id="mesa"></div>
@@ -469,6 +482,7 @@
 
     <div class="ajustes">
       <label class="marcador"><input type="checkbox" id="semRepetir"> Não repetir combinações já sorteadas</label>
+      <label class="marcador"><input type="checkbox" id="soComArtistas"> Só sortear combinações com artistas</label>
       <button class="botao fantasma" id="reiniciarFiltros">Reiniciar filtros</button>
       <p class="aviso" id="avisoFiltros"></p>
     </div>
@@ -479,6 +493,11 @@
         <button class="botao fantasma" id="limparHistorico">Limpar</button>
       </div>
       <div class="historico-lista" id="historicoLista"></div>
+    </div>
+
+    <div class="alerta-vazia" id="alertaVazia" hidden>
+      <p id="textoVazia"></p>
+      <button class="botao" id="sortearOutra">Sortear outra</button>
     </div>
 
     <div class="mapa" id="mapa" hidden>
@@ -554,7 +573,7 @@
 
   <footer>
     <p>Cada item é separado por uma divisória branca, e o ponteiro é desviado por ela a cada passagem. Pressione <kbd>Espaço</kbd> para girar as duas rodas.</p>
-    <p>O histórico e o tema escolhido ficam guardados neste aparelho. As listas editadas valem só nesta sessão.<br><span class="versao">versão 3.0 · 18/08/2026</span></p>
+    <p>O histórico e o tema escolhido ficam guardados neste aparelho. As listas editadas valem só nesta sessão.<br><span class="versao">versão 4.0 · 25/08/2026</span></p>
   </footer>
 </div>
 
@@ -649,6 +668,10 @@
         '</button>' +
       '</div>' +
       '<div class="itens" id="itens-' + config.indice + '" hidden>' +
+        '<div class="fileira conjuntos">' +
+          '<select class="campo conjunto" aria-label="Conjunto pronto para a roleta ' + config.indice + '"></select>' +
+          '<button class="botao fantasma carregar">Carregar</button>' +
+        '</div>' +
         '<div class="fileira">' +
           '<input class="campo novo" placeholder="' + config.exemplo + '" aria-label="Novo item da roleta ' + config.indice + '" maxlength="40">' +
           '<button class="botao fantasma adicionar">Adicionar</button>' +
@@ -675,6 +698,23 @@
     var painelItens = raiz.querySelector(".itens");
     var btEditar = raiz.querySelector(".editar");
     var btTrava = raiz.querySelector(".trava");
+    var seletor = raiz.querySelector(".conjunto");
+    var btCarregar = raiz.querySelector(".carregar");
+
+    (config.conjuntos || []).forEach(function(conj, i){
+      var op = document.createElement("option");
+      op.value = String(i);
+      op.textContent = conj.nome + " (" + conj.itens.length + ")";
+      seletor.appendChild(op);
+    });
+
+    btCarregar.addEventListener("click", function(){
+      var conj = (config.conjuntos || [])[Number(seletor.value)];
+      if(!conj || girando) return;
+      itens = conj.itens.slice();
+      renderizarItens();
+      mostrar("Lista trocada para " + conj.nome, false);
+    });
 
     btTrava.addEventListener("click", function(){ api.alternarTrava(); });
     var rotuloEditar = raiz.querySelector(".rotulo-editar");
@@ -766,7 +806,7 @@
       // divisórias brancas entre os itens
       ctx.save();
       ctx.strokeStyle = "#FFFFFF";
-      ctx.lineWidth = n > 24 ? Math.max(1.2, raio * 0.007) : Math.max(2, raio * 0.014);
+      ctx.lineWidth = n > 60 ? Math.max(0.8, raio * 0.004) : n > 24 ? Math.max(1.2, raio * 0.007) : Math.max(2, raio * 0.014);
       ctx.lineCap = "butt";
       for(var d = 0; d < n; d++){
         var ad = rotacao + d * fatia;
@@ -780,7 +820,7 @@
       // rótulos, do miolo para a borda
       var limite = raio - cubo - 16;
       var alturaFatia = 2 * Math.sin(fatia / 2) * (raio * 0.62);
-      var corpo = Math.max(7.5, Math.min(19, alturaFatia * 0.78, raio * 0.085));
+      var corpo = Math.max(6.5, Math.min(19, alturaFatia * 0.82, raio * 0.085));
       for(var t = 0; t < n; t++){
         var meio = rotacao + t * fatia + fatia / 2;
         ctx.save();
@@ -925,8 +965,8 @@
     function adicionar(){
       var valor = campo.value.trim();
       if(!valor){ campo.focus(); return; }
-      if(itens.length >= 80){
-        mostrar("Limite de 80 itens por roleta", false);
+      if(itens.length >= 160){
+        mostrar("Limite de 160 itens por roleta", false);
         return;
       }
       itens.push(valor);
@@ -959,6 +999,9 @@
     return api;
   }
 
+  var CONJUNTOS_ESTILO = [{"nome":"Essencial","itens":["Rock clássico","Hard rock","Rock alternativo","Rock progressivo","Indie rock","Punk rock","Post-punk","Grunge","Shoegaze","New wave","Heavy metal","Thrash metal","Death metal","Black metal","Doom metal","Power metal","Metalcore","Nu metal","Metal alternativo","Metal progressivo","House","Techno","Trance","Drum and bass","Dubstep","Ambient","Synthwave","Trip hop","Industrial","Electro","Pop rock","Synth-pop","Dream pop","Indie pop","Pop punk","Jazz","Blues","Soul","Funk","Disco","Hip hop","Trap","R&B","Reggae","Folk"]},{"nome":"Meus tops (Spotify)","itens":["Metal alternativo","Nu metal","Metalcore","Rap metal","Heavy metal","Metal industrial","Djent","Rock alternativo","Hard rock","Post-grunge","Grunge","Stoner rock","Funk rock","Rock industrial","Shoegaze","Britpop","New wave","Synth-pop","Emo","Screamo","Hardcore punk","Post-hardcore","Industrial","Rock clássico","Punk rock"]},{"nome":"Rock e derivados","itens":["Rock clássico","Hard rock","Rock alternativo","Rock progressivo","Indie rock","Post-rock","Garage rock","Rock psicodélico","Grunge","Post-grunge","Britpop","Shoegaze","Noise rock","Math rock","Blues rock","Southern rock","Stoner rock","Funk rock","Rock gótico","New wave","Krautrock","Surf rock"]},{"nome":"Metal","itens":["Heavy metal","Thrash metal","Death metal","Death metal melódico","Black metal","Doom metal","Power metal","Metal progressivo","Metal sinfônico","Folk metal","Metal gótico","Metal alternativo","Nu metal","Rap metal","Metal industrial","Metalcore","Deathcore","Djent","Groove metal","Sludge metal","Post-metal","Speed metal","Grindcore"]},{"nome":"Punk e hardcore","itens":["Punk rock","Hardcore punk","Post-punk","Post-hardcore","Screamo","Emo","Pop punk","Ska punk","Crust punk","Oi!"]},{"nome":"Eletrônica","itens":["House","Deep house","Tech house","Acid house","Techno","Minimal techno","Trance","Drum and bass","Jungle","Dubstep","Breakbeat","UK garage","Ambient","IDM","Trip hop","Downtempo","Synthwave","Electro","EBM","Industrial","Rock industrial","Big beat","Hardstyle","Eurodance","Chiptune"]},{"nome":"Pop","itens":["Pop rock","Synth-pop","Dream pop","Indie pop","Dance-pop","Electropop","Art pop","Power pop","Hyperpop","City pop","Bubblegum pop"]},{"nome":"Hip hop, soul e funk","itens":["Hip hop","Boom bap","Trap","Gangsta rap","Hip hop alternativo","R&B","Neo soul","Soul","Funk","Disco","Reggae","Dub","Ska","Rocksteady","Dancehall"]},{"nome":"Jazz e blues","itens":["Jazz","Bebop","Jazz fusion","Free jazz","Swing","Blues","Delta blues","Ragtime"]},{"nome":"Raízes e experimental","itens":["Folk","Folk rock","Country","Bluegrass","Gospel","Lounge","Experimental","Noise"]},{"nome":"Tudo (122)","itens":["Rock clássico","Hard rock","Rock alternativo","Rock progressivo","Indie rock","Post-rock","Garage rock","Rock psicodélico","Grunge","Post-grunge","Britpop","Shoegaze","Noise rock","Math rock","Blues rock","Southern rock","Stoner rock","Funk rock","Rock gótico","New wave","Krautrock","Surf rock","Heavy metal","Thrash metal","Death metal","Death metal melódico","Black metal","Doom metal","Power metal","Metal progressivo","Metal sinfônico","Folk metal","Metal gótico","Metal alternativo","Nu metal","Rap metal","Metal industrial","Metalcore","Deathcore","Djent","Groove metal","Sludge metal","Post-metal","Speed metal","Grindcore","Punk rock","Hardcore punk","Post-punk","Post-hardcore","Screamo","Emo","Pop punk","Ska punk","Crust punk","Oi!","House","Deep house","Tech house","Acid house","Techno","Minimal techno","Trance","Drum and bass","Jungle","Dubstep","Breakbeat","UK garage","Ambient","IDM","Trip hop","Downtempo","Synthwave","Electro","EBM","Industrial","Rock industrial","Big beat","Hardstyle","Eurodance","Chiptune","Pop rock","Synth-pop","Dream pop","Indie pop","Dance-pop","Electropop","Art pop","Power pop","Hyperpop","City pop","Bubblegum pop","Hip hop","Boom bap","Trap","Gangsta rap","Hip hop alternativo","R&B","Neo soul","Soul","Funk","Disco","Reggae","Dub","Ska","Rocksteady","Dancehall","Jazz","Bebop","Jazz fusion","Free jazz","Swing","Blues","Delta blues","Ragtime","Folk","Folk rock","Country","Bluegrass","Gospel","Lounge","Experimental","Noise"]}];
+  var CONJUNTOS_PAIS = [{"nome":"Essencial","itens":["Brasil","Argentina","Chile","Colômbia","Peru","Uruguai","México","Cuba","Jamaica","Estados Unidos","Canadá","Reino Unido","Irlanda","França","Alemanha","Itália","Espanha","Portugal","Países Baixos","Suécia","Noruega","Finlândia","Islândia","Grécia","Polônia","Rússia","Ucrânia","Chéquia","Hungria","Turquia","Japão","Coreia do Sul","China","Índia","Tailândia","Indonésia","Vietnã","Austrália","Nova Zelândia","Nigéria","Gana","Senegal","África do Sul","Angola","Quênia","Etiópia","Egito","Marrocos"]},{"nome":"América do Sul","itens":["Brasil","Argentina","Chile","Uruguai","Paraguai","Bolívia","Peru","Equador","Colômbia","Venezuela","Guiana","Suriname"]},{"nome":"América do Norte e Central","itens":["Estados Unidos","Canadá","México","Cuba","Jamaica","Porto Rico","República Dominicana","Haiti","Costa Rica","Panamá","Guatemala","Honduras","El Salvador","Nicarágua","Belize"]},{"nome":"Europa Ocidental","itens":["Reino Unido","Irlanda","França","Alemanha","Itália","Espanha","Portugal","Países Baixos","Bélgica","Suíça","Áustria","Suécia","Noruega","Dinamarca","Finlândia","Islândia","Grécia","Luxemburgo","Malta"]},{"nome":"Leste Europeu","itens":["Rússia","Polônia","Ucrânia","Chéquia","Eslováquia","Hungria","Romênia","Bulgária","Sérvia","Croácia","Eslovênia","Bósnia e Herzegovina","Macedônia do Norte","Montenegro","Albânia","Estônia","Letônia","Lituânia","Bielorrússia","Moldávia","Geórgia","Armênia","Azerbaijão"]},{"nome":"Ásia","itens":["Japão","Coreia do Sul","Coreia do Norte","China","Taiwan","Hong Kong","Mongólia","Índia","Paquistão","Bangladesh","Nepal","Sri Lanka","Tailândia","Vietnã","Camboja","Laos","Mianmar","Malásia","Indonésia","Filipinas","Cazaquistão","Uzbequistão","Turquia","Irã","Iraque","Israel","Líbano","Síria","Jordânia","Arábia Saudita","Emirados Árabes Unidos","Afeganistão"]},{"nome":"África","itens":["Nigéria","Gana","Senegal","Mali","Costa do Marfim","Camarões","Congo","República Democrática do Congo","Angola","Moçambique","África do Sul","Zimbábue","Zâmbia","Botsuana","Namíbia","Quênia","Tanzânia","Uganda","Etiópia","Sudão","Egito","Marrocos","Argélia","Tunísia","Líbia","Cabo Verde","Guiné","Benim","Togo","Burkina Faso","Madagascar","Maurício","Ruanda","Somália"]},{"nome":"Oceania","itens":["Austrália","Nova Zelândia","Papua-Nova Guiné"]},{"nome":"Tudo (138)","itens":["Brasil","Argentina","Chile","Uruguai","Paraguai","Bolívia","Peru","Equador","Colômbia","Venezuela","Guiana","Suriname","Estados Unidos","Canadá","México","Cuba","Jamaica","Porto Rico","República Dominicana","Haiti","Costa Rica","Panamá","Guatemala","Honduras","El Salvador","Nicarágua","Belize","Reino Unido","Irlanda","França","Alemanha","Itália","Espanha","Portugal","Países Baixos","Bélgica","Suíça","Áustria","Suécia","Noruega","Dinamarca","Finlândia","Islândia","Grécia","Luxemburgo","Malta","Rússia","Polônia","Ucrânia","Chéquia","Eslováquia","Hungria","Romênia","Bulgária","Sérvia","Croácia","Eslovênia","Bósnia e Herzegovina","Macedônia do Norte","Montenegro","Albânia","Estônia","Letônia","Lituânia","Bielorrússia","Moldávia","Geórgia","Armênia","Azerbaijão","Japão","Coreia do Sul","Coreia do Norte","China","Taiwan","Hong Kong","Mongólia","Índia","Paquistão","Bangladesh","Nepal","Sri Lanka","Tailândia","Vietnã","Camboja","Laos","Mianmar","Malásia","Indonésia","Filipinas","Cazaquistão","Uzbequistão","Turquia","Irã","Iraque","Israel","Líbano","Síria","Jordânia","Arábia Saudita","Emirados Árabes Unidos","Afeganistão","Nigéria","Gana","Senegal","Mali","Costa do Marfim","Camarões","Congo","República Democrática do Congo","Angola","Moçambique","África do Sul","Zimbábue","Zâmbia","Botsuana","Namíbia","Quênia","Tanzânia","Uganda","Etiópia","Sudão","Egito","Marrocos","Argélia","Tunísia","Líbia","Cabo Verde","Guiné","Benim","Togo","Burkina Faso","Madagascar","Maurício","Ruanda","Somália","Austrália","Nova Zelândia","Papua-Nova Guiné"]}];
+
   var mesa = document.getElementById("mesa");
   var par = document.getElementById("par");
   var btTudo = document.getElementById("girarTudo");
@@ -989,6 +1032,9 @@
   function normalizar(txt){
     return txt.normalize("NFD").replace(/[\u0300-\u036f]/g, "").toLowerCase().trim();
   }
+
+  var PAISES_EXTRA = {"Brasil":"br","Argentina":"ar","Chile":"cl","Uruguai":"uy","Paraguai":"py","Bolívia":"bo","Peru":"pe","Equador":"ec","Colômbia":"co","Venezuela":"ve","Guiana":"gy","Suriname":"sr","Estados Unidos":"us","Canadá":"ca","México":"mx","Cuba":"cu","Jamaica":"jm","Porto Rico":"pr","República Dominicana":"do","Haiti":"ht","Costa Rica":"cr","Panamá":"pa","Guatemala":"gt","Honduras":"hn","El Salvador":"sv","Nicarágua":"ni","Belize":"bz","Reino Unido":"gb","Irlanda":"ie","França":"fr","Alemanha":"de","Itália":"it","Espanha":"es","Portugal":"pt","Países Baixos":"nl","Bélgica":"be","Suíça":"ch","Áustria":"at","Suécia":"se","Noruega":"no","Dinamarca":"dk","Finlândia":"fi","Islândia":"is","Grécia":"gr","Luxemburgo":"lu","Malta":"mt","Rússia":"ru","Polônia":"pl","Ucrânia":"ua","Chéquia":"cz","Eslováquia":"sk","Hungria":"hu","Romênia":"ro","Bulgária":"bg","Sérvia":"rs","Croácia":"hr","Eslovênia":"si","Bósnia e Herzegovina":"ba","Macedônia do Norte":"mk","Montenegro":"me","Albânia":"al","Estônia":"ee","Letônia":"lv","Lituânia":"lt","Bielorrússia":"by","Moldávia":"md","Geórgia":"ge","Armênia":"am","Azerbaijão":"az","Japão":"jp","Coreia do Sul":"kr","Coreia do Norte":"kp","China":"cn","Taiwan":"tw","Hong Kong":"hk","Mongólia":"mn","Índia":"in","Paquistão":"pk","Bangladesh":"bd","Nepal":"np","Sri Lanka":"lk","Tailândia":"th","Vietnã":"vn","Camboja":"kh","Laos":"la","Mianmar":"mm","Malásia":"my","Indonésia":"id","Filipinas":"ph","Cazaquistão":"kz","Uzbequistão":"uz","Turquia":"tr","Irã":"ir","Iraque":"iq","Israel":"il","Líbano":"lb","Síria":"sy","Jordânia":"jo","Arábia Saudita":"sa","Emirados Árabes Unidos":"ae","Afeganistão":"af","Nigéria":"ng","Gana":"gh","Senegal":"sn","Mali":"ml","Costa do Marfim":"ci","Camarões":"cm","Congo":"cg","República Democrática do Congo":"cd","Angola":"ao","Moçambique":"mz","África do Sul":"za","Zimbábue":"zw","Zâmbia":"zm","Botsuana":"bw","Namíbia":"na","Quênia":"ke","Tanzânia":"tz","Uganda":"ug","Etiópia":"et","Sudão":"sd","Egito":"eg","Marrocos":"ma","Argélia":"dz","Tunísia":"tn","Líbia":"ly","Cabo Verde":"cv","Guiné":"gn","Benim":"bj","Togo":"tg","Burkina Faso":"bf","Madagascar":"mg","Maurício":"mu","Ruanda":"rw","Somália":"so","Austrália":"au","Nova Zelândia":"nz","Papua-Nova Guiné":"pg"};
+  Object.keys(PAISES_EXTRA).forEach(function(nome){ ISO[nome] = PAISES_EXTRA[nome]; });
 
   var INDICE = {};
   Object.keys(ISO).forEach(function(nome){ INDICE[normalizar(nome)] = ISO[nome]; });
@@ -1112,14 +1158,9 @@
   var a = Roleta({
     indice: "01",
     titulo: "Estilo musical",
-    exemplo: "Ex.: Bossa nova",
-    itens: [
-      /* rock */      "Rock clássico","Hard rock","Punk rock","Rock alternativo","Rock progressivo","Indie rock","Post-rock","Garage rock",
-      /* metal */     "Heavy metal","Thrash metal","Death metal","Black metal","Doom metal","Power metal","Metalcore","Nu metal",
-      /* eletrônica */"House","Techno","Trance","Drum and bass","Dubstep","Ambient","Synthwave","Electro",
-      /* pop */       "Pop rock","Synth-pop","Dream pop","Indie pop","Dance-pop","Pop punk",
-      /* raízes */    "Jazz","Blues","Soul","Funk","Disco","Reggae","Hip hop","R&B","Folk","Gospel"
-    ],
+    exemplo: "Ex.: Post-punk",
+    itens: ["Rock clássico","Hard rock","Rock alternativo","Rock progressivo","Indie rock","Punk rock","Post-punk","Grunge","Shoegaze","New wave","Heavy metal","Thrash metal","Death metal","Black metal","Doom metal","Power metal","Metalcore","Nu metal","Metal alternativo","Metal progressivo","House","Techno","Trance","Drum and bass","Dubstep","Ambient","Synthwave","Trip hop","Industrial","Electro","Pop rock","Synth-pop","Dream pop","Indie pop","Pop punk","Jazz","Blues","Soul","Funk","Disco","Hip hop","Trap","R&B","Reggae","Folk"],
+    conjuntos: CONJUNTOS_ESTILO,
     aoMudar: limparPar,
     aoResultado: function(){ atualizarPar(); }
   });
@@ -1127,11 +1168,9 @@
   var b = Roleta({
     indice: "02",
     titulo: "País",
-    exemplo: "Ex.: Portugal",
-    itens: ["Brasil","Japão","Itália","Nigéria","México","Índia","França","Jamaica","Portugal","Argentina",
-            "Egito","Espanha","Cuba","Alemanha","Marrocos","Irlanda","Austrália","Senegal","Colômbia","Peru",
-            "Chile","Uruguai","Canadá","Grécia","Turquia","Suécia","Noruega","Polônia","Rússia","China",
-            "Tailândia","Vietnã","Indonésia","Quênia","Etiópia","Gana","Angola","Coreia do Sul","Islândia","Reino Unido"],
+    exemplo: "Ex.: Geórgia",
+    itens: ["Brasil","Argentina","Chile","Colômbia","Peru","Uruguai","México","Cuba","Jamaica","Estados Unidos","Canadá","Reino Unido","Irlanda","França","Alemanha","Itália","Espanha","Portugal","Países Baixos","Suécia","Noruega","Finlândia","Islândia","Grécia","Polônia","Rússia","Ucrânia","Chéquia","Hungria","Turquia","Japão","Coreia do Sul","China","Índia","Tailândia","Indonésia","Vietnã","Austrália","Nova Zelândia","Nigéria","Gana","Senegal","África do Sul","Angola","Quênia","Etiópia","Egito","Marrocos"],
+    conjuntos: CONJUNTOS_PAIS,
     aoMudar: limparPar,
     aoResultado: function(){ atualizarPar(); }
   });
@@ -1251,17 +1290,7 @@
   });
 
   // ---------- perfis de artistas (MusicBrainz + Wikipédia) ----------
-  var TAGS = {
-    "Rock clássico":"classic rock","Hard rock":"hard rock","Punk rock":"punk","Rock alternativo":"alternative rock",
-    "Rock progressivo":"progressive rock","Indie rock":"indie rock","Post-rock":"post-rock","Garage rock":"garage rock",
-    "Heavy metal":"heavy metal","Thrash metal":"thrash metal","Death metal":"death metal","Black metal":"black metal",
-    "Doom metal":"doom metal","Power metal":"power metal","Metalcore":"metalcore","Nu metal":"nu metal",
-    "House":"house","Techno":"techno","Trance":"trance","Drum and bass":"drum and bass","Dubstep":"dubstep",
-    "Ambient":"ambient","Synthwave":"synthwave","Electro":"electro","Pop rock":"pop rock","Synth-pop":"synthpop",
-    "Dream pop":"dream pop","Indie pop":"indie pop","Dance-pop":"dance-pop","Pop punk":"pop punk",
-    "Jazz":"jazz","Blues":"blues","Soul":"soul","Funk":"funk","Disco":"disco","Reggae":"reggae",
-    "Hip hop":"hip hop","R&B":"rnb","Folk":"folk","Gospel":"gospel"
-  };
+  var TAGS = {"Rock clássico":"classic rock","Hard rock":"hard rock","Rock alternativo":"alternative rock","Rock progressivo":"progressive rock","Indie rock":"indie rock","Post-rock":"post-rock","Garage rock":"garage rock","Rock psicodélico":"psychedelic rock","Grunge":"grunge","Post-grunge":"post-grunge","Britpop":"britpop","Shoegaze":"shoegaze","Noise rock":"noise rock","Math rock":"math rock","Blues rock":"blues rock","Southern rock":"southern rock","Stoner rock":"stoner rock","Funk rock":"funk rock","Rock gótico":"gothic rock","New wave":"new wave","Krautrock":"krautrock","Surf rock":"surf rock","Heavy metal":"heavy metal","Thrash metal":"thrash metal","Death metal":"death metal","Death metal melódico":"melodic death metal","Black metal":"black metal","Doom metal":"doom metal","Power metal":"power metal","Metal progressivo":"progressive metal","Metal sinfônico":"symphonic metal","Folk metal":"folk metal","Metal gótico":"gothic metal","Metal alternativo":"alternative metal","Nu metal":"nu metal","Rap metal":"rap metal","Metal industrial":"industrial metal","Metalcore":"metalcore","Deathcore":"deathcore","Djent":"djent","Groove metal":"groove metal","Sludge metal":"sludge metal","Post-metal":"post-metal","Speed metal":"speed metal","Grindcore":"grindcore","Punk rock":"punk","Hardcore punk":"hardcore punk","Post-punk":"post-punk","Post-hardcore":"post-hardcore","Screamo":"screamo","Emo":"emo","Pop punk":"pop punk","Ska punk":"ska punk","Crust punk":"crust punk","Oi!":"oi","House":"house","Deep house":"deep house","Tech house":"tech house","Acid house":"acid house","Techno":"techno","Minimal techno":"minimal techno","Trance":"trance","Drum and bass":"drum and bass","Jungle":"jungle","Dubstep":"dubstep","Breakbeat":"breakbeat","UK garage":"uk garage","Ambient":"ambient","IDM":"idm","Trip hop":"trip hop","Downtempo":"downtempo","Synthwave":"synthwave","Electro":"electro","EBM":"ebm","Industrial":"industrial","Rock industrial":"industrial rock","Big beat":"big beat","Hardstyle":"hardstyle","Eurodance":"eurodance","Chiptune":"chiptune","Pop rock":"pop rock","Synth-pop":"synthpop","Dream pop":"dream pop","Indie pop":"indie pop","Dance-pop":"dance-pop","Electropop":"electropop","Art pop":"art pop","Power pop":"power pop","Hyperpop":"hyperpop","City pop":"city pop","Bubblegum pop":"bubblegum pop","Hip hop":"hip hop","Boom bap":"boom bap","Trap":"trap","Gangsta rap":"gangsta rap","Hip hop alternativo":"alternative hip hop","R&B":"rnb","Neo soul":"neo soul","Soul":"soul","Funk":"funk","Disco":"disco","Reggae":"reggae","Dub":"dub","Ska":"ska","Rocksteady":"rocksteady","Dancehall":"dancehall","Jazz":"jazz","Bebop":"bebop","Jazz fusion":"jazz fusion","Free jazz":"free jazz","Swing":"swing","Blues":"blues","Delta blues":"delta blues","Ragtime":"ragtime","Folk":"folk","Folk rock":"folk rock","Country":"country","Bluegrass":"bluegrass","Gospel":"gospel","Lounge":"lounge","Experimental":"experimental","Noise":"noise"};
 
   function tagDoEstilo(estilo){
     return TAGS[estilo] || normalizar(estilo);
@@ -1283,28 +1312,102 @@
     return "desde " + ini;
   }
 
-  function buscarWiki(nome, idioma){
-    var url = "https://" + idioma + ".wikipedia.org/w/api.php?action=query&format=json&origin=*" +
-      "&generator=search&gsrsearch=" + encodeURIComponent(nome + " banda música") +
-      "&gsrlimit=1&prop=pageimages|extracts&exintro=1&explaintext=1&exsentences=2&pithumbsize=180";
-    return fetch(url).then(function(r){ return r.ok ? r.json() : null; }).then(function(d){
-      var paginas = d && d.query && d.query.pages;
-      if(!paginas) return null;
-      var chave = Object.keys(paginas)[0];
-      var pag = paginas[chave];
-      return {
-        resumo: pag.extract || "",
-        foto: pag.thumbnail ? pag.thumbnail.source : "",
-        link: "https://" + idioma + ".wikipedia.org/?curid=" + pag.pageid
-      };
-    }).catch(function(){ return null; });
+  // fila que respeita o limite de uma consulta por segundo do MusicBrainz
+  var filaMB = Promise.resolve();
+  function consultarMB(caminho){
+    var resultado = filaMB.then(function(){
+      return fetch("https://musicbrainz.org/ws/2/" + caminho)
+        .then(function(r){ return r.ok ? r.json() : null; })
+        .catch(function(){ return null; });
+    });
+    var espera = function(){ return new Promise(function(ok){ setTimeout(ok, 1100); }); };
+    filaMB = resultado.then(espera, espera);
+    return resultado;
   }
 
-  function perfilDoArtista(nome){
-    return buscarWiki(nome, "pt").then(function(pt){
-      if(pt && (pt.foto || pt.resumo)) return pt;
-      return buscarWiki(nome, "en");
-    }).catch(function(){ return null; });
+  // busca uma página específica da Wikipédia pelo título exato
+  function paginaWiki(idioma, titulo){
+    var url = "https://" + idioma + ".wikipedia.org/w/api.php?action=query&format=json&origin=*" +
+      "&prop=pageimages|extracts&exintro=1&explaintext=1&exsentences=2&pithumbsize=180&redirects=1" +
+      "&titles=" + encodeURIComponent(titulo);
+    return fetch(url)
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var paginas = d && d.query && d.query.pages;
+        if(!paginas) return null;
+        var chave = Object.keys(paginas)[0];
+        if(chave === "-1") return null;                 // página inexistente
+        var pag = paginas[chave];
+        if(!pag.extract && !pag.thumbnail) return null;
+        return {
+          resumo: pag.extract || "",
+          foto: pag.thumbnail ? pag.thumbnail.source : "",
+          link: "https://" + idioma + ".wikipedia.org/?curid=" + pag.pageid
+        };
+      })
+      .catch(function(){ return null; });
+  }
+
+  // do identificador do Wikidata para o artigo em português, com queda para o inglês
+  function wikiPorWikidata(qid){
+    var url = "https://www.wikidata.org/w/api.php?action=wbgetentities&format=json&origin=*" +
+              "&props=sitelinks&ids=" + encodeURIComponent(qid);
+    return fetch(url)
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var ent = d && d.entities && d.entities[qid];
+        var links = ent && ent.sitelinks;
+        if(!links) return null;
+        if(links.ptwiki) return paginaWiki("pt", links.ptwiki.title);
+        if(links.enwiki) return paginaWiki("en", links.enwiki.title);
+        return null;
+      })
+      .catch(function(){ return null; });
+  }
+
+  // último recurso: busca textual, mas só aceita se o título bater com o nome
+  function wikiPorBusca(nome, idioma){
+    var url = "https://" + idioma + ".wikipedia.org/w/api.php?action=query&format=json&origin=*" +
+      "&list=search&srlimit=3&srsearch=" + encodeURIComponent(nome);
+    return fetch(url)
+      .then(function(r){ return r.ok ? r.json() : null; })
+      .then(function(d){
+        var achados = (d && d.query && d.query.search) || [];
+        var alvo = normalizar(nome);
+        for(var i = 0; i < achados.length; i++){
+          // "Christy Doran (músico)" conta; "Ray Anderson" não
+          var titulo = achados[i].title.replace(/\s*\([^)]*\)\s*$/, "");
+          if(normalizar(titulo) === alvo) return paginaWiki(idioma, achados[i].title);
+        }
+        return null;
+      })
+      .catch(function(){ return null; });
+  }
+
+  // o MusicBrainz guarda o vínculo oficial de cada artista com o Wikidata,
+  // então a identificação passa a ser pelo identificador, não pelo nome
+  function perfilDoArtista(artista){
+    if(!artista || !artista.id) return Promise.resolve(null);
+    return consultarMB("artist/" + artista.id + "?inc=url-rels&fmt=json")
+      .then(function(d){
+        var relacoes = (d && d.relations) || [];
+        var qid = null, artigo = null;
+        relacoes.forEach(function(rel){
+          var endereco = rel.url && rel.url.resource;
+          if(!endereco) return;
+          if(endereco.indexOf("wikidata.org") >= 0) qid = endereco.split("/").pop();
+          if(endereco.indexOf("wikipedia.org") >= 0 && !artigo) artigo = endereco;
+        });
+        if(artigo){
+          var partes = artigo.match(/https?:\/\/([a-z-]+)\.wikipedia\.org\/wiki\/(.+)$/);
+          if(partes) return paginaWiki(partes[1], decodeURIComponent(partes[2]));
+        }
+        if(qid) return wikiPorWikidata(qid);
+        return wikiPorBusca(artista.name, "pt").then(function(pt){
+          return pt || wikiPorBusca(artista.name, "en");
+        });
+      })
+      .catch(function(){ return null; });
   }
 
   function cartaoArtista(artista, estilo){
@@ -1413,7 +1516,7 @@
     });
 
     // enriquece com resumo da Wikipédia
-    perfilDoArtista(artista.name).then(function(perfil){
+    perfilDoArtista(artista).then(function(perfil){
       if(!perfil) return;
       if(perfil.resumo) resumo.textContent = perfil.resumo;
       if(perfil.foto && cartao.firstChild === vaga){
@@ -1441,11 +1544,9 @@
     aviso("Procurando artistas de " + q.estilo + " " + preposicao(q.pais) + "…");
 
     var consulta = 'tag:"' + tagDoEstilo(q.estilo) + '"' + (cod ? ' AND country:' + cod.toUpperCase() : '');
-    var url = "https://musicbrainz.org/ws/2/artist?query=" + encodeURIComponent(consulta) + "&fmt=json&limit=8";
-
-    fetch(url, { headers: { "Accept": "application/json" } })
-      .then(function(r){ if(!r.ok) throw new Error("HTTP " + r.status); return r.json(); })
+    consultarMB("artist?query=" + encodeURIComponent(consulta) + "&fmt=json&limit=8")
       .then(function(dados){
+        if(!dados) throw new Error("sem resposta");
         var lista = (dados.artists || []).filter(function(x){ return x.score >= 60; }).slice(0, 6);
         caixaArtistas.innerHTML = "";
         if(!lista.length){
@@ -1476,6 +1577,57 @@
 
   function mostrarAvisoFiltro(texto){ avisoFiltros.textContent = texto; }
 
+  // ---------- memória de quantos artistas cada combinação tem ----------
+  var CHAVE_CONTAGENS = "roleta-dupla:contagens";
+  var soComArtistas = document.getElementById("soComArtistas");
+  var alertaVazia = document.getElementById("alertaVazia");
+  var textoVazia = document.getElementById("textoVazia");
+  var mapaContagem = {};
+
+  (function carregarContagens(){
+    try{
+      var bruto = deposito.ler(CHAVE_CONTAGENS);
+      mapaContagem = bruto ? JSON.parse(bruto) : {};
+      if(typeof mapaContagem !== "object" || !mapaContagem) mapaContagem = {};
+    }catch(e){ mapaContagem = {}; }
+  })();
+
+  function salvarContagens(){
+    var chaves = Object.keys(mapaContagem);
+    if(chaves.length > 600){                       // mantém as mais recentes
+      var enxuto = {};
+      chaves.slice(-600).forEach(function(k){ enxuto[k] = mapaContagem[k]; });
+      mapaContagem = enxuto;
+    }
+    deposito.gravar(CHAVE_CONTAGENS, JSON.stringify(mapaContagem));
+  }
+
+  // uma consulta barata: pede só a contagem, não a lista
+  function contarArtistas(estilo, pais){
+    var cod = codigoDoPais(pais);
+    var consulta = 'tag:"' + tagDoEstilo(estilo) + '"' + (cod ? ' AND country:' + cod.toUpperCase() : '');
+    return consultarMB("artist?query=" + encodeURIComponent(consulta) + "&fmt=json&limit=1")
+      .then(function(d){ return d && typeof d.count === "number" ? d.count : null; })
+      .catch(function(){ return null; });
+  }
+
+  function esconderAlertaVazia(){ alertaVazia.hidden = true; }
+
+  function mostrarAlertaVazia(estilo, pais){
+    textoVazia.innerHTML = "";
+    textoVazia.appendChild(document.createTextNode("Não há artistas de "));
+    var e = document.createElement("b"); e.textContent = estilo;
+    textoVazia.appendChild(e);
+    textoVazia.appendChild(document.createTextNode(" " + preposicao(pais) + " nessa base. "));
+    textoVazia.appendChild(document.createTextNode("A combinação foi marcada e não sai de novo."));
+    alertaVazia.hidden = false;
+  }
+
+  document.getElementById("sortearOutra").addEventListener("click", function(){
+    esconderAlertaVazia();
+    girarTudo();
+  });
+
   function salvarUsadas(){
     var chaves = Object.keys(usadas).slice(-400);
     var enxuto = {};
@@ -1494,7 +1646,11 @@
   btReiniciarFiltros.addEventListener("click", function(){
     usadas = {};
     salvarUsadas();
+    mapaContagem = {};
+    salvarContagens();
+    esconderAlertaVazia();
     semRepetir.checked = false;
+    soComArtistas.checked = false;
     a.destravar(); b.destravar();
     mostrarAvisoFiltro("Filtros reiniciados: todas as combinações voltaram a valer.");
     setTimeout(function(){ mostrarAvisoFiltro(""); }, 4000);
@@ -1526,11 +1682,22 @@
       };
       var tempo = setTimeout(function(){ limpar(); resolve(null); }, 6000);
       window[nome] = function(dados){ clearTimeout(tempo); limpar(); resolve(dados); };
-      script.src = "https://itunes.apple.com/search?media=music&entity=song&limit=1&term=" +
-                   encodeURIComponent(termo) + "&callback=" + nome;
+      script.src = "https://itunes.apple.com/search?media=music&entity=song&attribute=artistTerm" +
+                   "&limit=12&term=" + encodeURIComponent(termo) + "&callback=" + nome;
       script.onerror = function(){ clearTimeout(tempo); limpar(); resolve(null); };
       document.head.appendChild(script);
     });
+  }
+
+  // o catálogo devolve o que mais se parece com a busca, não necessariamente
+  // o artista pedido — então o nome precisa bater antes de exibir qualquer coisa
+  function mesmoArtista(devolvido, procurado){
+    if(!devolvido) return false;
+    var a = normalizar(devolvido), b = normalizar(procurado);
+    if(a === b) return true;
+    // aceita "Artista feat. Outro" e "The Artista"
+    return a.indexOf(b + " feat") === 0 || a.indexOf(b + " &") === 0 ||
+           a.replace(/^the /, "") === b.replace(/^the /, "");
   }
 
   function midiaSpotify(nome){
@@ -1539,6 +1706,7 @@
       .then(function(r){ return r.ok ? r.json() : null; })
       .then(function(d){
         if(!d || !d.nome) return null;
+        if(!mesmoArtista(d.nome, nome)) return null;
         return { capa: d.capa || "", previa: d.previa || "", faixa: d.faixa || "", fonte: "Spotify" };
       })
       .catch(function(){ return null; });
@@ -1549,8 +1717,11 @@
     return midiaSpotify(nome).then(function(sp){
       if(sp && (sp.capa || sp.previa)){ cacheMidia[nome] = sp; return sp; }
       return itunesJSONP(nome).then(function(d){
-        var r = (d && d.results && d.results[0]) || null;
-        if(!r) return null;
+        var achados = (d && d.results) || [];
+        var doArtista = achados.filter(function(r){ return mesmoArtista(r.artistName, nome); });
+        if(!doArtista.length) return null;                       // melhor nada do que errado
+        // prefere uma faixa que tenha prévia disponível
+        var r = doArtista.filter(function(x){ return x.previewUrl; })[0] || doArtista[0];
         var midia = {
           capa: (r.artworkUrl100 || "").replace("100x100", "300x300"),
           previa: r.previewUrl || "",
@@ -1843,7 +2014,7 @@
       rodada.forEach(function(t){ t.ativo = false; });
       rodada[i].ativo = true;
       desenharRodada();
-      girarTudo(true).then(function(res){
+      girarTudo(true, true).then(function(res){
         rodada[i].ativo = false;
         if(res && res.estilo){
           rodada[i].estilo = res.estilo;
@@ -1868,8 +2039,7 @@
   function artistaPara(estilo, pais){
     var cod = codigoDoPais(pais);
     var consulta = 'tag:"' + tagDoEstilo(estilo) + '"' + (cod ? ' AND country:' + cod.toUpperCase() : '');
-    return fetch("https://musicbrainz.org/ws/2/artist?query=" + encodeURIComponent(consulta) + "&fmt=json&limit=5")
-      .then(function(r){ return r.ok ? r.json() : null; })
+    return consultarMB("artist?query=" + encodeURIComponent(consulta) + "&fmt=json&limit=5")
       .then(function(d){
         var lista = (d && d.artists) || [];
         if(!lista.length) return null;
@@ -2012,7 +2182,9 @@
       if(fixoA >= 0 && i !== fixoA) continue;
       for(var j = 0; j < paises.length; j++){
         if(fixoB >= 0 && j !== fixoB) continue;
-        if(semRepetir.checked && usadas[chave(estilos[i], paises[j])]) continue;
+        var k = chave(estilos[i], paises[j]);
+        if(semRepetir.checked && usadas[k]) continue;
+        if(mapaContagem[k] === 0) continue;          // já se sabe que não rende nada
         candidatos.push([i, j]);
       }
     }
@@ -2021,28 +2193,23 @@
     return { iEstilo: escolha[0], iPais: escolha[1] };
   }
 
-  function girarTudo(rapido){
-    if(a.estaGirando() || b.estaGirando()) return Promise.resolve(null);
-    if(!a.temItens() && !b.temItens()) return Promise.resolve(null);
-    // travar só vale depois que a roda já tem um resultado para segurar
-    var travaA = a.estaTravada() && !!a.ultimo;
-    var travaB = b.estaTravada() && !!b.ultimo;
-    if(travaA && travaB){
-      mostrarAvisoFiltro("As duas rodas estão travadas. Destrave uma para sortear.");
-      return Promise.resolve(null);
-    }
-
-    var combo = sortearCombinacao();
-    if(!combo){
-      mostrarAvisoFiltro("Todas as combinações possíveis já saíram. Use “Reiniciar filtros”.");
-      return Promise.resolve(null);
-    }
-    mostrarAvisoFiltro("");
-
+  function executarGiro(combo, rapido, travaA, travaB){
     btTudo.disabled = true;
-    var giros = [];
-    giros.push(travaA ? Promise.resolve(a.ultimo) : a.girar(combo.iEstilo, rapido === true));
-    giros.push(travaB ? Promise.resolve(b.ultimo) : b.girar(combo.iPais, rapido === true));
+    esconderAlertaVazia();
+
+    var estilo = a.lista()[combo.iEstilo];
+    var pais = b.lista()[combo.iPais];
+    var k = chave(estilo, pais);
+
+    // a verificação corre em paralelo com a animação, então não atrasa o giro
+    var verificacao = (mapaContagem[k] === undefined)
+      ? contarArtistas(estilo, pais)
+      : Promise.resolve(mapaContagem[k]);
+
+    var giros = [
+      travaA ? Promise.resolve(a.ultimo) : a.girar(combo.iEstilo, rapido === true),
+      travaB ? Promise.resolve(b.ultimo) : b.girar(combo.iPais, rapido === true)
+    ];
 
     return Promise.all(giros).then(function(){
       btTudo.disabled = false;
@@ -2051,7 +2218,76 @@
         usadas[chave(a.ultimo, b.ultimo)] = true;
         salvarUsadas();
       }
-      return { estilo: a.ultimo, pais: b.ultimo };
+      return verificacao.then(function(n){
+        if(typeof n === "number"){
+          mapaContagem[k] = n;
+          salvarContagens();
+          if(n === 0){
+            mostrarAlertaVazia(estilo, pais);
+          }else{
+            mostrarAvisoFiltro(n + (n === 1 ? " artista catalogado" : " artistas catalogados") + " nessa combinação");
+          }
+        }
+        return { estilo: a.ultimo, pais: b.ultimo, artistas: n };
+      });
+    });
+  }
+
+  // procura uma combinação que tenha artistas antes de girar
+  function escolherComVerificacao(tentativas){
+    var combo = sortearCombinacao();
+    if(!combo) return Promise.resolve(null);
+    var estilo = a.lista()[combo.iEstilo];
+    var pais = b.lista()[combo.iPais];
+    var k = chave(estilo, pais);
+
+    if(mapaContagem[k] > 0) return Promise.resolve(combo);
+
+    return contarArtistas(estilo, pais).then(function(n){
+      if(typeof n === "number"){ mapaContagem[k] = n; salvarContagens(); }
+      if(n === null) return combo;                  // sem rede: gira assim mesmo
+      if(n > 0) return combo;
+      if(tentativas <= 1) return null;
+      return escolherComVerificacao(tentativas - 1);
+    });
+  }
+
+  function girarTudo(rapido, exigirArtistas){
+    if(a.estaGirando() || b.estaGirando()) return Promise.resolve(null);
+    if(!a.temItens() && !b.temItens()) return Promise.resolve(null);
+
+    // travar só vale depois que a roda já tem um resultado para segurar
+    var travaA = a.estaTravada() && !!a.ultimo;
+    var travaB = b.estaTravada() && !!b.ultimo;
+    if(travaA && travaB){
+      mostrarAvisoFiltro("As duas rodas estão travadas. Destrave uma para sortear.");
+      return Promise.resolve(null);
+    }
+
+    var verificarAntes = exigirArtistas === true || soComArtistas.checked;
+
+    if(!verificarAntes){
+      var combo = sortearCombinacao();
+      if(!combo){
+        mostrarAvisoFiltro("Todas as combinações possíveis já saíram. Use “Reiniciar filtros”.");
+        return Promise.resolve(null);
+      }
+      mostrarAvisoFiltro("");
+      return executarGiro(combo, rapido, travaA, travaB);
+    }
+
+    btTudo.disabled = true;
+    esconderAlertaVazia();
+    mostrarAvisoFiltro("Procurando uma combinação com artistas…");
+
+    return escolherComVerificacao(6).then(function(escolhido){
+      btTudo.disabled = false;
+      if(!escolhido){
+        mostrarAvisoFiltro("Não encontrei combinação com artistas depois de seis tentativas. Tente reiniciar os filtros.");
+        return null;
+      }
+      mostrarAvisoFiltro("");
+      return executarGiro(escolhido, rapido, travaA, travaB);
     });
   }
 
