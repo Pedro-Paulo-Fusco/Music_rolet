@@ -2,7 +2,7 @@
 // Estratégia: a página sempre tenta a rede primeiro (para atualizar na hora)
 // e só cai no cache quando não há conexão. Os demais arquivos usam cache
 // com revalidação em segundo plano.
-const CACHE = "sintonia-dupla-v8";
+const CACHE = "sintonia-dupla-v9";
 const CASCA = ["./", "./index.html", "./manifest.webmanifest", "./icone.svg", "./icone-192.png", "./icone-512.png"];
 
 self.addEventListener("install", function(evento){

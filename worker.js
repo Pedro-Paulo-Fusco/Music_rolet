@@ -1,8 +1,10 @@
 /**
  * Worker da Cloudflare para a Roleta dupla.
  *
- * Guarda as credenciais do Spotify no servidor e devolve, para um nome de artista,
- * a capa do álbum, o nome da faixa e a prévia de 30 segundos quando existir.
+ * Guarda as credenciais do Spotify no servidor. Responde a duas rotas:
+ *
+ *   /artista?nome=...   capa do álbum, nome da faixa e prévia de 30 s quando existir
+ *   /playlists?q=...    playlists públicas que combinam com o estilo e o país sorteados
  *
  * Publicação (leva uns 5 minutos):
  *   1. Crie um app em https://developer.spotify.com/dashboard e anote o Client ID e o Client Secret.
@@ -61,6 +63,26 @@ async function buscarArtista(nome, token) {
   return (d.artists && d.artists.items && d.artists.items[0]) || null;
 }
 
+async function buscarPlaylists(termo, token, limite) {
+  const url = "https://api.spotify.com/v1/search?type=playlist&limit=" + limite +
+              "&q=" + encodeURIComponent(termo);
+  const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
+  if (!r.ok) return [];
+  const d = await r.json();
+  const itens = (d.playlists && d.playlists.items) || [];
+  // desde 2024 a busca do Spotify devolve buracos (null) no meio da lista
+  return itens
+    .filter(Boolean)
+    .map(p => ({
+      nome: p.name || "",
+      dono: (p.owner && (p.owner.display_name || p.owner.id)) || "",
+      faixas: (p.tracks && p.tracks.total) || 0,
+      capa: (p.images && p.images[0] && p.images[0].url) || "",
+      link: (p.external_urls && p.external_urls.spotify) || ""
+    }))
+    .filter(p => p.link && p.nome);
+}
+
 async function faixaPrincipal(idArtista, token) {
   const url = `https://api.spotify.com/v1/artists/${idArtista}/top-tracks?market=BR`;
   const r = await fetch(url, { headers: { Authorization: `Bearer ${token}` } });
@@ -79,8 +101,24 @@ export default {
     if (pedido.method === "OPTIONS") return new Response(null, { headers: cabs });
 
     const url = new URL(pedido.url);
+
+    if (url.pathname.startsWith("/playlists")) {
+      const termo = (url.searchParams.get("q") || "").trim();
+      if (!termo) {
+        return new Response(JSON.stringify({ erro: "informe o parâmetro q" }), { status: 400, headers: cabs });
+      }
+      const limite = Math.min(20, Math.max(1, Number(url.searchParams.get("limite")) || 8));
+      try {
+        const token = await pegarToken(env);
+        const listas = await buscarPlaylists(termo, token, limite);
+        return new Response(JSON.stringify({ playlists: listas }), { headers: cabs });
+      } catch (erro) {
+        return new Response(JSON.stringify({ erro: String(erro.message || erro) }), { status: 502, headers: cabs });
+      }
+    }
+
     if (!url.pathname.startsWith("/artista")) {
-      return new Response(JSON.stringify({ erro: "use /artista?nome=..." }), { status: 404, headers: cabs });
+      return new Response(JSON.stringify({ erro: "use /artista?nome=... ou /playlists?q=..." }), { status: 404, headers: cabs });
     }
 
     const nome = (url.searchParams.get("nome") || "").trim();

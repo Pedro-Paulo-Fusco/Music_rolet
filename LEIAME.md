@@ -40,6 +40,18 @@ combinação, em giros rápidos e sem repetir. **Montar playlist do grupo** busc
 artista para cada combinação e monta a lista, exportável em CSV ou como mensagem
 pronta para o WhatsApp.
 
+### Mergulhar na combinação
+Abaixo dos atalhos, **Playlists no Spotify** e **Playlists no YouTube** abrem a busca
+de listas para a combinação sorteada — funcionam sem configurar nada.
+
+Com o worker do Spotify ligado, aparece também **Trazer playlists**: o app busca
+playlists públicas dessa combinação e monta uma trilha de cartões com capa, número de
+faixas e quem montou. Clicar abre a lista no Spotify.
+
+> As playlists que o próprio Spotify monta (Discover Weekly, Daily Mix, as "This Is")
+> deixaram de sair pela API para apps novos. O que vem aqui são listas públicas de
+> outras pessoas — que costumam ser justamente as mais interessantes para garimpar.
+
 ### Favoritos
 A estrela em cada cartão de artista guarda a descoberta neste aparelho. A lista sai
 em CSV (para planilha) ou como texto formatado para colar em conversa.
@@ -51,6 +63,8 @@ em CSV (para planilha) ou como texto formatado para colar em conversa.
 - **Resumo e foto**: Wikipédia em português, com queda para o inglês.
 - **Capa e prévia de 30 s**: catálogo da Apple (sem cadastro) ou Spotify, se você
   configurar o worker.
+- **Playlists**: busca pública do Spotify, através do worker. Sem worker, os links
+  abrem a busca direto no aplicativo.
 - **Histórico, favoritos e preferências**: ficam no navegador; nada sai do aparelho.
 
 ## Ligar o Spotify (opcional)
@@ -61,4 +75,15 @@ cole o endereço dele no campo que fica em **Favoritos → Usar o Spotify**.
 Vale saber: desde o fim de 2024 o Spotify devolve `preview_url` vazio para a maioria
 dos apps novos. Quando isso acontece, o app volta sozinho ao catálogo da Apple, que
 continua entregando os 30 segundos. O ganho real do Spotify são as capas oficiais,
-os gêneros catalogados e a contagem de seguidores.
+os gêneros catalogados, a contagem de seguidores e a busca de playlists.
+
+O worker responde a duas rotas:
+
+| Rota | Devolve |
+| --- | --- |
+| `/artista?nome=...` | capa, faixa principal e prévia de 30 s |
+| `/playlists?q=...&limite=10` | playlists públicas da combinação |
+
+Se você já tinha o worker publicado antes desta versão, **cole o `worker.js` novo na
+Cloudflare** — o worker antigo não conhece a rota `/playlists` e o botão vai responder
+com erro 404.

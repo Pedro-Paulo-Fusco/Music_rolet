@@ -366,7 +366,7 @@
   .registro time{font-family:"Space Mono",monospace;font-size:10px;color:var(--painel-suave)}
   .vazio{font-size:13px;color:var(--painel-suave);margin:10px 0 0}
 
-  .descobrir{grid-column:1/-1;border-top:1px solid var(--painel-linha);padding-top:16px;margin-top:2px}
+  .descobrir{grid-column:1/-1;min-width:0;border-top:1px solid var(--painel-linha);padding-top:16px;margin-top:2px}
   .consulta{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
   .consulta span{font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--painel-suave)}
   .consulta code{
@@ -382,6 +382,80 @@
   .atalho:hover{background:var(--painel-sup-forte)}
   .atalho:focus-visible{outline:3px solid var(--destaque);outline-offset:3px}
   .atalhos .botao{background:var(--destaque);color:#141414;border-color:var(--painel-texto);box-shadow:0 3px 0 var(--painel-texto);font-size:14px;padding:9px 18px}
+
+  /* ---------- mergulho: playlists da combinação ---------- */
+  .mergulho{margin-top:16px;min-width:0;border-top:1px solid var(--painel-linha);padding-top:14px}
+  .mergulho-topo{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+  .mergulho-topo > span{
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.18em;
+    text-transform:uppercase;color:var(--painel-suave);flex:none;
+  }
+  .mergulho-links{display:flex;gap:8px;flex-wrap:wrap;margin-left:auto}
+  .mergulho .atalho{font-size:12px;padding:6px 12px}
+  .mergulho .botao.fantasma{
+    background:transparent;color:var(--painel-suave);border-color:var(--painel-borda);
+    box-shadow:none;font-size:12px;padding:6px 12px;
+  }
+  .mergulho .botao.fantasma:hover{background:var(--painel-sup-forte);color:var(--painel-texto)}
+
+  /* trilha horizontal: evita a fileira de três cartões iguais e rola bem no celular */
+  .trilha{
+    display:flex;gap:10px;margin-top:12px;overflow-x:auto;
+    min-width:0;max-width:100%;
+    padding-bottom:6px;scroll-snap-type:x proximity;
+    scrollbar-width:thin;scrollbar-color:var(--painel-borda) transparent;
+  }
+  .trilha:empty{margin-top:0}
+  .trilha::-webkit-scrollbar{height:6px}
+  .trilha::-webkit-scrollbar-thumb{background:var(--painel-borda);border-radius:3px}
+
+  .lista-spotify{
+    flex:none;width:168px;scroll-snap-align:start;text-decoration:none;
+    display:flex;flex-direction:column;gap:8px;
+    color:var(--painel-texto);border:1px solid var(--painel-borda);border-radius:10px;
+    padding:10px;background:var(--painel-sup);
+    transition:transform .18s cubic-bezier(.16,1,.3,1), background .18s ease, border-color .18s ease;
+  }
+  .lista-spotify:hover{background:var(--painel-sup-forte);border-color:var(--painel-texto);transform:translateY(-2px)}
+  .lista-spotify:active{transform:translateY(0) scale(.985)}
+  .lista-spotify:focus-visible{outline:3px solid var(--destaque);outline-offset:3px}
+  .lista-spotify img{
+    width:100%;aspect-ratio:1;object-fit:cover;border-radius:6px;display:block;
+    background:var(--painel-sup-forte);
+  }
+  .lista-spotify .sem-capa{
+    width:100%;aspect-ratio:1;border-radius:6px;background:var(--painel-sup-forte);
+    display:flex;align-items:center;justify-content:center;
+    font-family:"Space Mono",monospace;font-size:10px;letter-spacing:.14em;color:var(--painel-suave);
+  }
+  .lista-spotify b{
+    font-family:"Instrument Sans",sans-serif;font-weight:600;font-size:13px;line-height:1.25;
+    display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;
+  }
+  .lista-spotify small{
+    font-family:"Space Mono",monospace;font-size:10px;color:var(--painel-suave);
+    white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-top:-2px;
+  }
+
+  /* esqueletos com brilho correndo, no lugar de um giro genérico */
+  .lista-fantasma{
+    flex:none;width:168px;border:1px solid var(--painel-linha);border-radius:10px;padding:10px;
+    display:flex;flex-direction:column;gap:8px;
+  }
+  .lista-fantasma i, .lista-fantasma u{
+    display:block;border-radius:6px;background:var(--painel-sup);
+    background-image:linear-gradient(90deg, transparent 0%, var(--painel-sup-forte) 50%, transparent 100%);
+    background-size:200% 100%;animation:brilho 1.35s ease-in-out infinite;
+  }
+  .lista-fantasma i{width:100%;aspect-ratio:1}
+  .lista-fantasma u{height:12px}
+  .lista-fantasma u:last-child{width:60%;height:9px}
+  @keyframes brilho{0%{background-position:120% 0}100%{background-position:-120% 0}}
+
+  .nota-mergulho{
+    margin:10px 0 0;font-size:12px;color:var(--painel-suave);line-height:1.5;
+  }
+  .nota-mergulho:empty{display:none}
 
   .artistas{margin-top:14px;display:grid;gap:10px}
   .artistas:empty{margin-top:0}
@@ -628,6 +702,20 @@
         <a class="atalho" id="lkGoogle" target="_blank" rel="noopener noreferrer">Abrir no Google</a>
         <a class="atalho" id="lkWiki" target="_blank" rel="noopener noreferrer">Abrir na Wikipédia</a>
       </div>
+
+      <div class="mergulho" id="mergulho">
+        <div class="mergulho-topo">
+          <span>Mergulhar na combinação</span>
+          <div class="mergulho-links">
+            <a class="atalho" id="lkListaSp" target="_blank" rel="noopener noreferrer">Playlists no Spotify</a>
+            <a class="atalho" id="lkListaYt" target="_blank" rel="noopener noreferrer">Playlists no YouTube</a>
+            <button class="botao fantasma" id="trazerListas" hidden>Trazer playlists</button>
+          </div>
+        </div>
+        <div class="trilha" id="playlists" aria-live="polite"></div>
+        <p class="nota-mergulho" id="notaMergulho"></p>
+      </div>
+
       <div class="artistas" id="artistas" aria-live="polite"></div>
     </div>
   </div>
@@ -678,7 +766,7 @@
 
   <footer>
     <p>A escala mostra só a vizinhança da leitura — a sigla no topo é o item sob a marca, e o nome inteiro aparece no centro do mostrador. Pressione <kbd>Espaço</kbd> para acionar os dois.</p>
-    <p>O histórico e o tema escolhido ficam guardados neste aparelho. As listas editadas valem só nesta sessão.<br><span class="versao">versão 5.0 · mostradores · 05/09/2026</span></p>
+    <p>O histórico e o tema escolhido ficam guardados neste aparelho. As listas editadas valem só nesta sessão.<br><span class="versao">versão 5.1 · playlists · 06/09/2026</span></p>
   </footer>
 </div>
 
@@ -1209,8 +1297,14 @@
     yt:   document.getElementById("lkYoutube"),
     sp:   document.getElementById("lkSpotify"),
     go:   document.getElementById("lkGoogle"),
-    wiki: document.getElementById("lkWiki")
+    wiki: document.getElementById("lkWiki"),
+    listaSp: document.getElementById("lkListaSp"),
+    listaYt: document.getElementById("lkListaYt")
   };
+
+  var caixaListas = document.getElementById("playlists");
+  var notaMergulho = document.getElementById("notaMergulho");
+  var btListas = document.getElementById("trazerListas");
 
   var ISO = {"Andorra":"ad","United Arab Emirates":"ae","Afghanistan":"af","Albania":"al","Armenia":"am","Angola":"ao","Argentina":"ar","Austria":"at","Australia":"au","Azerbaijan":"az","Bosnia and Herzegovina":"ba","Bangladesh":"bd","Belgium":"be","Burkina Faso":"bf","Bulgaria":"bg","Bahrain":"bh","Burundi":"bi","Benin":"bj","Brunei Darussalam":"bn","Bolivia, Plurinational State of":"bo","Brazil":"br","Bhutan":"bt","Botswana":"bw","Belarus":"by","Belize":"bz","Canada":"ca","Congo, the Democratic Republic of the":"cd","Central African Republic":"cf","Congo":"cg","Switzerland":"ch","Chile":"cl","Cameroon":"cm","China":"cn","Colombia":"co","Costa Rica":"cr","Cuba":"cu","Cape Verde":"cv","Cyprus":"cy","Czech Republic":"cz","Germany":"de","Djibouti":"dj","Denmark":"dk","Dominican Republic":"do","Algeria":"dz","Ecuador":"ec","Estonia":"ee","Egypt":"eg","Western Sahara":"eh","Eritrea":"er","Spain":"es","Ethiopia":"et","Finland":"fi","France":"fr","Gabon":"ga","United Kingdom":"gb","Georgia":"ge","French Guiana":"gf","Ghana":"gh","Greenland":"gl","Gambia":"gm","Guinea":"gn","Equatorial Guinea":"gq","Greece":"gr","Guatemala":"gt","Guam":"gu","Guinea-Bissau":"gw","Guyana":"gy","Hong Kong":"hk","Honduras":"hn","Croatia":"hr","Haiti":"ht","Hungary":"hu","Indonesia":"id","Ireland":"ie","Israel":"il","India":"in","Iraq":"iq","Iran, Islamic Republic of":"ir","Iceland":"is","Italy":"it","Jamaica":"jm","Jordan":"jo","Japan":"jp","Kenya":"ke","Kyrgyzstan":"kg","Cambodia":"kh","Korea, Republic of":"kr","Kuwait":"kw","Kazakhstan":"kz","Lebanon":"lb","Liechtenstein":"li","Sri Lanka":"lk","Liberia":"lr","Lesotho":"ls","Lithuania":"lt","Luxembourg":"lu","Latvia":"lv","Libyan Arab Jamahiriya":"ly","Morocco":"ma","Moldova, Republic of":"md","Montenegro":"me","Madagascar":"mg","Macedonia, the former Yugoslav Republic of":"mk","Mali":"ml","Myanmar":"mm","Mongolia":"mn","Mauritania":"mr","Malta":"mt","Mauritius":"mu","Malawi":"mw","Mexico":"mx","Malaysia":"my","Mozambique":"mz","Namibia":"na","Niger":"ne","Nigeria":"ng","Nicaragua":"ni","Netherlands":"nl","Norway":"no","Nepal":"np","New Zealand":"nz","Oman":"om","Panama":"pa","Peru":"pe","Papua New Guinea":"pg","Philippines":"ph","Pakistan":"pk","Poland":"pl","Puerto Rico":"pr","Palestine, State of":"ps","Portugal":"pt","Paraguay":"py","Reunion":"re","Romania":"ro","Serbia":"rs","Russian Federation":"ru","Rwanda":"rw","Saudi Arabia":"sa","Sudan":"sd","Sweden":"se","Slovenia":"si","Slovakia":"sk","Sierra Leone":"sl","San Marino":"sm","Senegal":"sn","Somalia":"so","Suriname":"sr","Sao Tome and Principe":"st","El Salvador":"sv","Syrian Arab Republic":"sy","Swaziland":"sz","Chad":"td","Togo":"tg","Thailand":"th","Tajikistan":"tj","Timor-Leste":"tl","Turkmenistan":"tm","Tunisia":"tn","Turkey":"tr","Taiwan, Province of China":"tw","Tanzania, United Republic of":"tz","Ukraine":"ua","Uganda":"ug","United States":"us","Uruguay":"uy","Uzbekistan":"uz","Venezuela, Bolivarian Republic of":"ve","Viet Nam":"vn","Yemen":"ye","Mayotte":"yt","South Africa":"za","Zambia":"zm","Zimbabwe":"zw","Brasil":"br","Japão":"jp","Itália":"it","Nigéria":"ng","México":"mx","Índia":"in","França":"fr","Egito":"eg","Espanha":"es","Alemanha":"de","Marrocos":"ma","Irlanda":"ie","Austrália":"au","Colômbia":"co","Uruguai":"uy","Canadá":"ca","Grécia":"gr","Turquia":"tr","Suécia":"se","Noruega":"no","Polônia":"pl","Rússia":"ru","Tailândia":"th","Vietnã":"vn","Indonésia":"id","Quênia":"ke","Etiópia":"et","Gana":"gh","Coreia do Sul":"kr","Islândia":"is","Reino Unido":"gb","Inglaterra":"gb","Escócia":"gb","Estados Unidos":"us","EUA":"us","Países Baixos":"nl","Holanda":"nl","Suíça":"ch","Áustria":"at","Bélgica":"be","Dinamarca":"dk","Finlândia":"fi","Hungria":"hu","Romênia":"ro","Ucrânia":"ua","Irã":"ir","Iraque":"iq","Arábia Saudita":"sa","Emirados Árabes Unidos":"ae","Paquistão":"pk","Filipinas":"ph","Malásia":"my","Nova Zelândia":"nz","Venezuela":"ve","Bolívia":"bo","Paraguai":"py","Equador":"ec","Panamá":"pa","República Dominicana":"do","Argélia":"dz","Tunísia":"tn","Líbia":"ly","Sudão":"sd","Camarões":"cm","Costa do Marfim":"ci","Moçambique":"mz","Zimbábue":"zw","Tanzânia":"tz","Croácia":"hr","Sérvia":"rs","Chéquia":"cz","República Tcheca":"cz","Eslováquia":"sk","Bulgária":"bg","Estônia":"ee","Letônia":"lv","Lituânia":"lt","Cazaquistão":"kz","Mongólia":"mn","Camboja":"kh","Laos":"la","Mianmar":"mm","Coreia do Norte":"kp","Taiwan":"tw","Singapura":"sg","Cingapura":"sg"};
   var CAIXAS = {"ad":[491.9,127.6,0.9,0.7],"ae":[641.0,185.5,14.3,12.0],"af":[663.5,142.2,39.6,31.5],"al":[542.2,127.6,5.1,10.4],"am":[610.4,132.3,10.1,8.5],"ao":[521.2,297.1,37.9,42.5],"ar":[278.1,352.8,47.1,114.7],"at":[514.7,105.8,20.8,9.0],"au":[822.5,314.1,122.6,114.8],"az":[614.9,130.1,15.8,12.2],"ba":[531.9,118.7,10.7,9.2],"bd":[750.1,183.6,16.0,20.3],"be":[496.0,97.5,10.3,6.6],"bf":[468.2,223.8,24.2,19.9],"bg":[550.4,122.2,17.4,10.2],"bh":[634.3,182.0,4.7,4.9],"bi":[574.6,284.7,5.6,7.4],"bj":[487.6,233.3,9.5,21.6],"bn":[849.1,277.3,3.7,3.4],"bo":[271.6,310.4,38.9,46.2],"br":[257.3,258.2,120.7,136.3],"bt":[751.4,177.7,10.1,5.7],"bw":[546.0,338.7,28.4,32.0],"by":[550.7,82.1,24.7,16.1],"bz":[212.9,212.0,4.4,9.1],"ca":[142.5,5.0,242.0,125.0],"cd":[522.7,257.9,58.9,65.7],"cf":[529.5,238.1,40.2,30.7],"cg":[519.4,263.7,23.2,30.3],"ch":[504.8,110.0,12.4,6.6],"ci":[458.6,239.1,18.9,22.3],"cl":[271.3,337.8,46.1,131.8],"cm":[511.4,230.8,23.7,40.0],"cn":[697.6,90.6,158.8,122.3],"co":[241.0,233.2,37.6,58.2],"cr":[221.3,237.5,9.9,11.1],"cu":[228.9,195.5,31.8,11.7],"cv":[420.3,234.7,7.9,8.0],"cy":[580.7,151.9,6.6,3.8],"cz":[521.5,99.0,18.5,8.3],"de":[505.1,86.1,24.1,25.7],"dj":[613.5,232.2,5.0,6.2],"dk":[511.0,76.8,11.6,10.4],"do":[266.6,207.0,11.1,8.0],"dz":[460.2,147.0,61.7,63.1],"ec":[202.1,271.6,50.6,22.4],"ee":[545.6,70.7,15.4,6.7],"eg":[559.6,165.9,34.1,34.7],"eh":[433.8,179.8,26.4,24.2],"er":[596.7,213.7,20.8,19.6],"es":[432.6,123.8,67.1,55.9],"et":[586.7,224.6,46.1,40.1],"fi":[539.7,38.6,27.9,31.5],"fr":[475.9,98.8,38.8,33.3],"ga":[512.1,268.4,17.8,21.9],"gb":[468.9,67.6,25.3,34.9],"ge":[599.8,124.4,20.0,8.6],"gf":[316.5,256.5,9.2,12.6],"gh":[475.2,237.7,13.6,22.3],"gl":[350.6,4.0,124.2,65.7],"gm":[433.8,228.3,9.2,2.6],"gn":[439.1,232.3,22.5,19.2],"gq":[511.0,263.5,9.0,9.7],"gr":[543.5,130.8,25.2,23.7],"gt":[203.2,214.2,12.8,14.3],"gu":[926.1,226.7,4.7,4.9],"gw":[433.9,232.3,9.4,6.1],"gy":[295.9,246.8,14.8,25.6],"hk":[829.8,197.8,1.4,0.9],"hn":[211.9,220.6,19.2,10.6],"hr":[525.5,114.3,16.3,14.1],"ht":[259.0,206.9,8.9,6.6],"hu":[532.6,107.3,18.3,9.6],"id":[778.5,256.9,141.8,57.9],"ie":[461.9,84.8,12.0,12.8],"il":[587.6,160.2,3.7,13.3],"in":[691.2,152.6,85.3,95.7],"iq":[600.3,146.0,29.9,29.0],"ir":[613.1,137.7,62.2,51.1],"is":[435.6,49.2,25.3,9.6],"it":[506.5,112.4,33.4,35.9],"jm":[247.1,211.9,6.5,2.8],"jo":[590.1,159.9,12.0,14.6],"jp":[863.8,117.9,31.9,67.6],"ke":[589.9,260.4,24.4,32.5],"kg":[684.9,125.5,28.7,14.1],"kh":[798.7,225.2,16.5,16.4],"kp":[841.3,126.5,14.0,18.4],"kr":[851.2,141.7,11.7,18.9],"kw":[625.3,171.4,17.1,23.8],"kz":[614.9,84.3,109.6,50.4],"la":[789.0,198.0,25.5,29.9],"lb":[589.1,155.4,4.7,5.6],"li":[512.1,109.9,4.7,4.9],"lk":[742.5,260.5,7.0,13.6],"lr":[449.7,246.7,12.6,14.5],"ls":[566.4,376.5,7.3,7.2],"lt":[544.2,81.1,15.0,8.3],"lu":[503.1,101.3,4.7,4.9],"lv":[543.9,75.7,18.6,7.8],"ly":[514.0,160.6,47.4,47.8],"ma":[446.7,151.1,36.6,28.8],"md":[561.1,107.6,10.0,10.4],"me":[539.6,124.6,4.8,5.7],"mg":[616.3,318.6,23.3,47.6],"mk":[545.5,128.6,7.0,5.2],"ml":[447.9,189.2,50.6,51.9],"mm":[764.6,176.8,26.9,64.9],"mn":[725.7,95.3,91.2,35.9],"mr":[433.9,181.2,37.5,43.8],"mt":[527.0,149.2,4.7,4.9],"mu":[659.5,346.5,1.2,1.8],"mw":[585.4,309.4,9.7,27.1],"mx":[134.4,162.3,88.6,63.5],"my":[793.7,252.1,60.0,21.4],"mz":[577.7,313.4,32.5,57.2],"na":[521.2,335.9,41.0,41.8],"ne":[485.9,194.5,48.1,41.2],"ng":[493.4,228.1,36.8,33.6],"ni":[216.7,224.2,14.5,14.9],"nl":[498.3,90.9,10.3,9.1],"no":[474.0,10.6,88.5,65.3],"np":[724.3,170.2,25.5,14.1],"nz":[931.5,396.9,69.3,56.7],"om":[643.5,184.4,22.9,33.8],"pa":[229.7,243.1,17.7,8.4],"pe":[234.2,276.8,40.7,63.8],"pg":[918.9,281.4,46.7,35.9],"ph":[845.2,211.6,29.8,47.4],"pk":[666.8,147.1,46.2,46.4],"pl":[526.8,86.3,26.8,19.5],"pr":[268.8,193.6,4.9,2.1],"ps":[587.4,162.9,3.8,4.6],"pt":[406.3,129.4,63.8,33.1],"py":[296.5,344.0,26.0,29.1],"re":[652.9,349.6,1.7,1.7],"ro":[544.1,108.4,26.2,15.8],"rs":[540.2,115.4,12.2,15.0],"ru":[541.3,7.6,393.8,125.1],"rw":[574.2,280.3,6.2,6.1],"sa":[589.3,164.3,64.7,55.1],"sd":[552.2,195.7,50.8,68.7],"se":[518.8,41.6,30.1,42.9],"si":[525.3,113.1,8.8,4.9],"sk":[534.7,103.9,15.0,6.2],"sl":[444.2,241.6,9.3,10.8],"sm":[520.7,121.1,4.7,4.9],"sn":[431.9,218.2,18.5,15.3],"so":[611.5,234.8,31.6,47.7],"sr":[306.1,255.6,12.4,14.5],"st":[517.1,293.4,0.8,1.3],"sv":[209.4,226.2,7.3,4.4],"sy":[591.0,146.2,18.3,17.3],"sz":[578.2,367.0,4.2,5.0],"td":[526.5,194.8,32.1,55.5],"tg":[484.8,237.7,5.9,17.6],"th":[781.5,205.2,26.6,51.6],"tj":[679.8,133.2,23.8,15.1],"tl":[878.4,324.0,10.6,4.3],"tm":[635.6,127.3,43.4,26.4],"tn":[508.6,146.1,11.9,24.8],"tr":[561.4,129.6,54.9,21.8],"tw":[847.7,188.3,4.4,11.5],"tz":[576.3,280.0,33.0,37.6],"ua":[548.8,94.6,48.4,27.1],"ug":[576.2,261.8,17.1,19.8],"us":[1.3,34.7,981.9,175.5],"uy":[315.0,381.8,15.4,16.9],"uz":[643.2,117.6,51.5,29.2],"ve":[259.4,233.9,41.5,40.4],"vn":[794.1,194.9,26.6,51.8],"ye":[615.6,209.9,36.7,23.7],"yt":[623.5,321.0,0.3,1.0],"za":[535.3,354.0,49.0,44.2],"zm":[552.6,305.3,36.1,34.4],"zw":[562.3,331.2,23.7,23.9]};
@@ -1388,8 +1482,15 @@
     };
   }
 
+  // o termo das playlists é mais curto que o dos artistas: "Doom metal México"
+  function termoLista(q){ return q.estilo + " " + q.pais; }
+
   function montarAtalhos(q){
     var termo = encodeURIComponent(q.texto);
+    var lista = encodeURIComponent(termoLista(q));
+    atalhos.listaSp.href = "https://open.spotify.com/search/" + lista + "/playlists";
+    // sp=EgIQAw%3D%3D é o filtro "Playlist" do YouTube; sem ele, cai numa busca normal
+    atalhos.listaYt.href = "https://www.youtube.com/results?search_query=" + lista + "&sp=EgIQAw%3D%3D";
     atalhos.yt.href   = "https://www.youtube.com/results?search_query=" + termo;
     atalhos.sp.href   = "https://open.spotify.com/search/" + termo;
     atalhos.go.href   = "https://www.google.com/search?q=" + termo;
@@ -1432,6 +1533,7 @@
 
     campoConsulta.textContent = q.texto;
     montarAtalhos(q);
+    limparMergulho();
     painelDescobrir.hidden = false;
     caixaArtistas.innerHTML = "";
     btIA.disabled = false;
@@ -1774,6 +1876,130 @@
     return cartao;
   }
 
+  // ---------- mergulho: playlists da combinacao ----------
+  var cacheListas = {};
+
+  function limparMergulho(){
+    caixaListas.textContent = "";
+    notaMergulho.textContent = "";
+    ajustarMergulho();
+  }
+
+  function ajustarMergulho(){
+    // o botao so aparece quando o worker do Spotify esta configurado
+    btListas.hidden = !urlWorker;
+    btListas.disabled = false;
+    btListas.textContent = "Trazer playlists";
+    if(!urlWorker && !caixaListas.children.length){
+      notaMergulho.textContent = "Os dois links acima abrem a busca de playlists direto no aplicativo. " +
+        "Ligue o Spotify em Favoritos para as capas aparecerem aqui dentro.";
+    }
+  }
+
+  function esqueletosLista(quantos){
+    caixaListas.textContent = "";
+    for(var i = 0; i < quantos; i++){
+      var oco = document.createElement("div");
+      oco.className = "lista-fantasma";
+      oco.setAttribute("aria-hidden", "true");
+      oco.style.animationDelay = (i * 90) + "ms";
+      oco.innerHTML = "<i></i><u></u><u></u>";
+      caixaListas.appendChild(oco);
+    }
+  }
+
+  function cartaoLista(lista){
+    var cartao = document.createElement("a");
+    cartao.className = "lista-spotify";
+    cartao.href = lista.link;
+    cartao.target = "_blank";
+    cartao.rel = "noopener noreferrer";
+
+    if(lista.capa){
+      var img = document.createElement("img");
+      img.src = lista.capa;
+      img.alt = "";
+      img.loading = "lazy";
+      cartao.appendChild(img);
+    }else{
+      var vazio = document.createElement("div");
+      vazio.className = "sem-capa";
+      vazio.textContent = "SEM CAPA";
+      cartao.appendChild(vazio);
+    }
+
+    var nome = document.createElement("b");
+    nome.textContent = lista.nome;
+    cartao.appendChild(nome);
+
+    var pe = document.createElement("small");
+    var partes = [];
+    if(lista.faixas) partes.push(lista.faixas + (lista.faixas === 1 ? " faixa" : " faixas"));
+    if(lista.dono) partes.push(lista.dono);
+    pe.textContent = partes.join(" \u00b7 ");
+    cartao.appendChild(pe);
+
+    return cartao;
+  }
+
+  function buscarPlaylists(){
+    var q = consultaAtual();
+    if(!q || !urlWorker) return;
+
+    var termo = termoLista(q);
+    if(cacheListas[termo]){ mostrarListas(cacheListas[termo], termo); return; }
+
+    btListas.disabled = true;
+    btListas.textContent = "Buscando\u2026";
+    notaMergulho.textContent = "";
+    esqueletosLista(4);
+
+    fetch(urlWorker + "/playlists?q=" + encodeURIComponent(termo) + "&limite=10")
+      .then(function(r){
+        if(!r.ok) throw new Error("o worker respondeu " + r.status);
+        return r.json();
+      })
+      .then(function(d){
+        if(d && d.erro) throw new Error(d.erro);
+        var listas = (d && d.playlists) || [];
+        // so guarda resultado cheio: vazio pode ser hiccup, e o botao precisa poder tentar de novo
+        if(listas.length) cacheListas[termo] = listas;
+        mostrarListas(listas, termo);
+      })
+      .catch(function(erro){
+        caixaListas.textContent = "";
+        btListas.disabled = false;
+        btListas.textContent = "Tentar de novo";
+        notaMergulho.textContent = "Não deu para trazer as playlists: " +
+          (erro && erro.message ? erro.message : "falha na busca") +
+          ". Os links acima continuam abrindo a busca no Spotify.";
+      });
+  }
+
+  function mostrarListas(listas, termo){
+    caixaListas.textContent = "";
+    btListas.disabled = false;
+    btListas.textContent = listas.length ? "Buscar de novo" : "Tentar de novo";
+
+    if(!listas.length){
+      notaMergulho.textContent = "Nenhuma playlist pública veio para \u201c" + termo + "\u201d. " +
+        "Vale abrir a busca no Spotify pelo link acima \u2014 as listas montadas pelo próprio Spotify " +
+        "não saem mais pela API.";
+      return;
+    }
+
+    listas.forEach(function(lista, i){
+      var cartao = cartaoLista(lista);
+      cartao.style.animation = menosMovimento ? "none" : "pousar .4s cubic-bezier(.2,1.4,.4,1) both";
+      cartao.style.animationDelay = (i * 55) + "ms";
+      caixaListas.appendChild(cartao);
+    });
+    notaMergulho.textContent = listas.length + (listas.length === 1 ? " playlist pública" : " playlists públicas") +
+      " para \u201c" + termo + "\u201d, no catálogo do Spotify.";
+  }
+
+  btListas.addEventListener("click", buscarPlaylists);
+
   function buscarArtistas(){
     var q = consultaAtual();
     if(!q) return;
@@ -1909,6 +2135,8 @@
     urlWorker = campoWorker.value.trim().replace(/\/$/, "");
     deposito.gravar(CHAVE_WORKER, urlWorker);
     btSalvarWorker.textContent = urlWorker ? "Salvo" : "Removido";
+    cacheListas = {};
+    ajustarMergulho();
     setTimeout(function(){ btSalvarWorker.textContent = "Salvar"; }, 2000);
   });
 
