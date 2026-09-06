@@ -1,13 +1,13 @@
-# Roleta dupla — app
+# Sintonia dupla — app
 
-Sorteia um **estilo musical** e um **país**, destaca o país no mapa-múndi e traz **artistas reais**
+Sintoniza um **estilo musical** e um **país**, destaca o país no mapa-múndi e traz **artistas reais**
 dessa combinação, com capa de álbum, prévia de 30 segundos e links para ouvir.
 
 ## Arquivos
 
 | Arquivo | Função |
 | --- | --- |
-| `index.html` | O app inteiro: roletas, mapa, filtros, modo festa, favoritos e histórico |
+| `index.html` | O app inteiro: mostradores, mapa, filtros, modo festa, favoritos e histórico |
 | `manifest.webmanifest` | Torna o app instalável (nome, ícones, cores) |
 | `sw.js` | Service worker: página sempre pela rede, com cache de reserva para uso offline |
 | `worker.js` | **Opcional.** Cloudflare Worker que guarda as chaves do Spotify |

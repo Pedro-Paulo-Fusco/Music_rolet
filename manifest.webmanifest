@@ -1,7 +1,7 @@
 {
-  "name": "Roleta dupla — estilo musical e país",
-  "short_name": "Roleta dupla",
-  "description": "Sorteia um estilo musical e um país, mostra o país no mapa-múndi e traz artistas reais dessa combinação.",
+  "name": "Sintonia dupla — estilo musical e país",
+  "short_name": "Sintonia dupla",
+  "description": "Dois mostradores sintonizam um estilo musical e um país, acendem o país no mapa-múndi e trazem artistas reais dessa combinação.",
   "start_url": "./index.html",
   "scope": "./",
   "display": "standalone",
