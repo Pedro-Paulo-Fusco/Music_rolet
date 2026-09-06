@@ -52,6 +52,25 @@ faixas e quem montou. Clicar abre a lista no Spotify.
 > deixaram de sair pela API para apps novos. O que vem aqui são listas públicas de
 > outras pessoas — que costumam ser justamente as mais interessantes para garimpar.
 
+### Criar playlist na sua conta
+Com sua conta do Spotify conectada, o botão **Criar playlist na minha conta** monta uma
+playlist **privada** chamada `<estilo> x <país>` com as faixas mais tocadas dos artistas
+que apareceram na tela. Clique antes em **Descobrir artistas** — é dessa lista que a
+playlist sai.
+
+Como ligar, em **Favoritos → Criar playlists na sua conta**:
+
+1. Crie um app em [developer.spotify.com/dashboard](https://developer.spotify.com/dashboard).
+2. Em *Redirect URIs*, cadastre **exatamente** o endereço que o app mostra nesse painel.
+3. Cole o **Client ID** no campo e clique em **Conectar minha conta**.
+
+O Client ID não é secreto: a autorização usa PKCE, então nenhum segredo fica no
+navegador e o worker não entra nessa parte. **Nunca cole o Client Secret no app.**
+
+> Dois limites do Spotify, não do app: a conexão só funciona na versão publicada (o
+> Spotify exige retorno em https), e apps novos começam em *modo de desenvolvimento* —
+> só o dono e até 25 pessoas cadastradas no painel conseguem autorizar.
+
 ### Favoritos
 A estrela em cada cartão de artista guarda a descoberta neste aparelho. A lista sai
 em CSV (para planilha) ou como texto formatado para colar em conversa.
@@ -65,6 +84,8 @@ em CSV (para planilha) ou como texto formatado para colar em conversa.
   configurar o worker.
 - **Playlists**: busca pública do Spotify, através do worker. Sem worker, os links
   abrem a busca direto no aplicativo.
+- **Playlist criada na sua conta**: API do Spotify direto do navegador, com autorização
+  PKCE. Nada passa pelo worker.
 - **Histórico, favoritos e preferências**: ficam no navegador; nada sai do aparelho.
 
 ## Ligar o Spotify (opcional)

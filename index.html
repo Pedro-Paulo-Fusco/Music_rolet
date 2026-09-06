@@ -457,6 +457,35 @@
   }
   .nota-mergulho:empty{display:none}
 
+  .aviso-playlist{
+    margin:10px 0 0;font-size:12px;line-height:1.5;color:var(--painel-suave);
+  }
+  .aviso-playlist:empty{display:none}
+  .aviso-playlist.ruim{color:var(--alerta)}
+
+  .playlist-pronta{
+    display:flex;flex-direction:column;gap:3px;margin-top:12px;text-decoration:none;
+    border:1.5px solid var(--destaque);border-radius:10px;padding:12px 14px;
+    background:var(--painel-sup);color:var(--painel-texto);
+    transition:background .18s ease, transform .18s cubic-bezier(.16,1,.3,1);
+  }
+  .playlist-pronta:hover{background:var(--painel-sup-forte)}
+  .playlist-pronta:active{transform:scale(.99)}
+  .playlist-pronta:focus-visible{outline:3px solid var(--destaque);outline-offset:3px}
+  .playlist-pronta b{
+    font-family:"Bricolage Grotesque",sans-serif;font-weight:700;font-size:17px;letter-spacing:-.02em;
+  }
+  .playlist-pronta small{font-family:"Space Mono",monospace;font-size:11px;color:var(--painel-suave)}
+
+  .conta-linha{
+    display:flex;align-items:center;gap:10px;flex-wrap:wrap;margin-top:12px;
+    font-size:13px;color:var(--texto-suave);
+  }
+  .conta-linha .marca{
+    font-family:"Space Mono",monospace;font-size:11px;letter-spacing:.1em;text-transform:uppercase;
+  }
+  .conta-linha .marca.ligada{color:var(--texto)}
+
   .artistas{margin-top:14px;display:grid;gap:10px}
   .artistas:empty{margin-top:0}
   .cartao{
@@ -710,10 +739,13 @@
             <a class="atalho" id="lkListaSp" target="_blank" rel="noopener noreferrer">Playlists no Spotify</a>
             <a class="atalho" id="lkListaYt" target="_blank" rel="noopener noreferrer">Playlists no YouTube</a>
             <button class="botao fantasma" id="trazerListas" hidden>Trazer playlists</button>
+            <button class="botao fantasma" id="criarPlaylist" hidden>Criar playlist na minha conta</button>
           </div>
         </div>
         <div class="trilha" id="playlists" aria-live="polite"></div>
         <p class="nota-mergulho" id="notaMergulho"></p>
+        <div id="playlistCriada"></div>
+        <p class="aviso-playlist" id="avisoPlaylist" role="status" aria-live="polite"></p>
       </div>
 
       <div class="artistas" id="artistas" aria-live="polite"></div>
@@ -762,11 +794,27 @@
         <button class="botao fantasma" id="salvarWorker">Salvar</button>
       </div>
     </details>
+
+    <details class="config-spotify">
+      <summary>Criar playlists na sua conta do Spotify (opcional)</summary>
+      <p class="nota">Cole o <b>Client ID</b> do seu app em <a href="https://developer.spotify.com/dashboard" target="_blank" rel="noopener noreferrer">developer.spotify.com/dashboard</a> e cadastre lá, em <i>Redirect URIs</i>, exatamente o endereço mostrado abaixo. O Client ID não é secreto — a autorização usa PKCE, então <b>nenhum segredo fica no navegador</b>. Nunca cole aqui o <i>Client Secret</i>.</p>
+      <div class="fileira">
+        <input class="campo" id="idSpotify" placeholder="Client ID do seu app" spellcheck="false" autocomplete="off">
+        <button class="botao fantasma" id="salvarIdSpotify">Salvar</button>
+      </div>
+      <p class="nota">Redirect URI para cadastrar: <code id="enderecoRetorno"></code></p>
+      <div class="conta-linha">
+        <span class="marca" id="marcaConta">Conta: desconectada</span>
+        <button class="botao fantasma" id="conectarSpotify" hidden>Conectar minha conta</button>
+        <button class="botao fantasma" id="desconectarSpotify" hidden>Desconectar</button>
+      </div>
+      <p class="nota" id="avisoConta"></p>
+    </details>
   </section>
 
   <footer>
     <p>A escala mostra só a vizinhança da leitura — a sigla no topo é o item sob a marca, e o nome inteiro aparece no centro do mostrador. Pressione <kbd>Espaço</kbd> para acionar os dois.</p>
-    <p>O histórico e o tema escolhido ficam guardados neste aparelho. As listas editadas valem só nesta sessão.<br><span class="versao">versão 5.1 · playlists · 06/09/2026</span></p>
+    <p>O histórico e o tema escolhido ficam guardados neste aparelho. As listas editadas valem só nesta sessão.<br><span class="versao">versão 5.2 · playlist na conta · 06/09/2026</span></p>
   </footer>
 </div>
 
@@ -1882,6 +1930,9 @@
   function limparMergulho(){
     caixaListas.textContent = "";
     notaMergulho.textContent = "";
+    // a playlist criada era da combinacao anterior: nao pode sobrar na tela
+    if(caixaPlaylist) caixaPlaylist.textContent = "";
+    if(avisoPlaylist){ avisoPlaylist.textContent = ""; avisoPlaylist.classList.remove("ruim"); }
     ajustarMergulho();
   }
 
@@ -2000,9 +2051,12 @@
 
   btListas.addEventListener("click", buscarPlaylists);
 
+  var artistasAtuais = [];
+
   function buscarArtistas(){
     var q = consultaAtual();
     if(!q) return;
+    artistasAtuais = [];
     var cod = codigoDoPais(q.pais);
 
     btIA.disabled = true;
@@ -2021,6 +2075,8 @@
           return;
         }
         lista.forEach(function(art){ caixaArtistas.appendChild(cartaoArtista(art, q.estilo)); });
+        artistasAtuais = lista.map(function(art){ return art.name; });
+        ajustarConta();
       })
       .catch(function(){
         aviso("Não consegui consultar a base de artistas agora. Use os atalhos acima para abrir a mesma busca.");
@@ -2124,6 +2180,338 @@
     mostrarAvisoFiltro("Filtros reiniciados: todas as combinações voltaram a valer.");
     setTimeout(function(){ mostrarAvisoFiltro(""); }, 4000);
   });
+
+  // ================= conta do Spotify: autorizacao PKCE =================
+  // PKCE existe justamente para isto: app que roda no navegador, sem segredo nenhum
+  // guardado no cliente. O Client ID e publico; quem digita a senha e o Spotify.
+  var CHAVE_CLIENTE = "roleta-dupla:spotify-cliente";
+  var CHAVE_SESSAO = "roleta-dupla:spotify-sessao";
+  var ESCOPOS = "playlist-modify-private user-read-private";
+
+  var campoIdSpotify = document.getElementById("idSpotify");
+  var btSalvarId = document.getElementById("salvarIdSpotify");
+  var btConectar = document.getElementById("conectarSpotify");
+  var btDesconectar = document.getElementById("desconectarSpotify");
+  var marcaConta = document.getElementById("marcaConta");
+  var avisoConta = document.getElementById("avisoConta");
+  var btCriar = document.getElementById("criarPlaylist");
+  var caixaPlaylist = document.getElementById("playlistCriada");
+  var avisoPlaylist = document.getElementById("avisoPlaylist");
+
+  var idCliente = deposito.ler(CHAVE_CLIENTE) || "";
+  var sessaoSpotify = null;
+  try{ sessaoSpotify = JSON.parse(deposito.ler(CHAVE_SESSAO) || "null"); }catch(e){ sessaoSpotify = null; }
+
+  campoIdSpotify.value = idCliente;
+
+  // guarda de vida curta: morre com a aba, que e o que queremos para o verificador
+  var guardaCurta = {
+    gravar: function(k, v){ try{ sessionStorage.setItem(k, v); }catch(e){} },
+    ler: function(k){ try{ return sessionStorage.getItem(k); }catch(e){ return null; } },
+    tirar: function(k){ try{ sessionStorage.removeItem(k); }catch(e){} }
+  };
+
+  // o Spotify so aceita redirect https (ou loopback), e exige igualdade exata
+  function paginaPublicada(){
+    return location.protocol === "https:" ||
+           (location.protocol === "http:" && /^(127\.0\.0\.1|localhost)$/.test(location.hostname));
+  }
+
+  function enderecoRetorno(){
+    if(!paginaPublicada()) return "";
+    return location.origin + location.pathname;
+  }
+
+  var mostraRetorno = document.getElementById("enderecoRetorno");
+  if(mostraRetorno){
+    mostraRetorno.textContent = enderecoRetorno() ||
+      "disponível só no app publicado (esta página não está em https)";
+  }
+
+  function base64url(bytes){
+    var texto = "";
+    for(var i = 0; i < bytes.length; i++) texto += String.fromCharCode(bytes[i]);
+    return btoa(texto).replace(/\+/g, "-").replace(/\//g, "_").replace(/=+$/, "");
+  }
+
+  function sorteioSeguro(tamanho){
+    var bytes = new Uint8Array(tamanho);
+    crypto.getRandomValues(bytes);
+    return base64url(bytes);
+  }
+
+  function desafioDe(verificador){
+    return crypto.subtle.digest("SHA-256", new TextEncoder().encode(verificador))
+      .then(function(buf){ return base64url(new Uint8Array(buf)); });
+  }
+
+  function avisarConta(texto){ avisoConta.textContent = texto || ""; }
+
+  function avisarPlaylist(texto, ruim){
+    avisoPlaylist.textContent = texto || "";
+    avisoPlaylist.classList.toggle("ruim", !!ruim);
+  }
+
+  function contaConectada(){
+    return !!(sessaoSpotify && sessaoSpotify.acesso);
+  }
+
+  function ajustarConta(){
+    var ligada = contaConectada();
+    if(!ligada && !paginaPublicada()){
+      marcaConta.textContent = "Conta: indisponível fora do https";
+      marcaConta.classList.remove("ligada");
+      btConectar.hidden = true;
+      btDesconectar.hidden = true;
+      btCriar.hidden = true;
+      return;
+    }
+    marcaConta.textContent = "Conta: " + (ligada ? "conectada" : "desconectada");
+    marcaConta.classList.toggle("ligada", ligada);
+    btConectar.hidden = ligada || !idCliente;
+    btDesconectar.hidden = !ligada;
+    btConectar.textContent = "Conectar minha conta";
+    btCriar.hidden = !ligada;
+    btCriar.disabled = false;
+    btCriar.textContent = "Criar playlist na minha conta";
+  }
+
+  btSalvarId.addEventListener("click", function(){
+    idCliente = campoIdSpotify.value.trim();
+    deposito.gravar(CHAVE_CLIENTE, idCliente);
+    btSalvarId.textContent = idCliente ? "Salvo" : "Removido";
+    setTimeout(function(){ btSalvarId.textContent = "Salvar"; }, 1600);
+    avisarConta(idCliente ? "" : "Sem Client ID, a criação de playlist fica desligada.");
+    ajustarConta();
+  });
+
+  btConectar.addEventListener("click", function(){
+    if(!idCliente){ avisarConta("Cole antes o Client ID do seu app."); return; }
+    if(!enderecoRetorno()){
+      avisarConta("O Spotify só aceita retorno em https. Abra o app publicado em vez do arquivo local.");
+      return;
+    }
+    if(!(window.crypto && crypto.subtle)){
+      avisarConta("Este navegador não expõe crypto.subtle aqui. A autorização precisa de uma página em HTTPS — abra o app publicado, não o arquivo local.");
+      return;
+    }
+    var verificador = sorteioSeguro(48);
+    var estado = sorteioSeguro(12);
+    guardaCurta.gravar("pkce", verificador);
+    guardaCurta.gravar("estado", estado);
+    btConectar.textContent = "Abrindo o Spotify\u2026";
+    desafioDe(verificador).then(function(desafio){
+      var campos = new URLSearchParams({
+        client_id: idCliente,
+        response_type: "code",
+        redirect_uri: enderecoRetorno(),
+        code_challenge_method: "S256",
+        code_challenge: desafio,
+        state: estado,
+        scope: ESCOPOS
+      });
+      location.href = "https://accounts.spotify.com/authorize?" + campos.toString();
+    }).catch(function(){
+      btConectar.textContent = "Conectar minha conta";
+      avisarConta("Não deu para preparar a autorização neste navegador.");
+    });
+  });
+
+  btDesconectar.addEventListener("click", function(){
+    sessaoSpotify = null;
+    deposito.gravar(CHAVE_SESSAO, "");
+    caixaPlaylist.textContent = "";
+    avisarPlaylist("");
+    avisarConta("Conta desconectada deste aparelho. O Spotify continua com a permissão concedida — para tirar de vez, use Configurações → Apps na sua conta.");
+    ajustarConta();
+  });
+
+  function guardarSessao(resposta){
+    return resposta.json().then(function(d){
+      if(!resposta.ok || !d.access_token){
+        throw new Error(d.error_description || d.error || "o Spotify recusou o pedido");
+      }
+      sessaoSpotify = {
+        acesso: d.access_token,
+        renova: d.refresh_token || (sessaoSpotify && sessaoSpotify.renova) || "",
+        expira: Date.now() + ((d.expires_in || 3600) * 1000)
+      };
+      deposito.gravar(CHAVE_SESSAO, JSON.stringify(sessaoSpotify));
+      return sessaoSpotify;
+    });
+  }
+
+  function pedirToken(campos){
+    return fetch("https://accounts.spotify.com/api/token", {
+      method: "POST",
+      headers: { "Content-Type": "application/x-www-form-urlencoded" },
+      body: campos.toString()
+    }).then(guardarSessao);
+  }
+
+  function tokenValido(){
+    if(!contaConectada()) return Promise.reject(new Error("nenhuma conta conectada"));
+    if(sessaoSpotify.expira > Date.now() + 60000) return Promise.resolve(sessaoSpotify.acesso);
+    if(!sessaoSpotify.renova) return Promise.reject(new Error("a sessão expirou; conecte a conta de novo"));
+    return pedirToken(new URLSearchParams({
+      grant_type: "refresh_token",
+      refresh_token: sessaoSpotify.renova,
+      client_id: idCliente
+    })).then(function(s){ return s.acesso; });
+  }
+
+  // volta da tela de autorizacao do Spotify
+  (function retornoDoSpotify(){
+    var campos = new URLSearchParams(location.search);
+    var codigo = campos.get("code");
+    var estado = campos.get("state");
+    var erro = campos.get("error");
+    if(!codigo && !erro) return;
+
+    history.replaceState(null, "", enderecoRetorno());
+
+    if(erro){ avisarConta("O Spotify recusou a autorização: " + erro + "."); return; }
+    if(!estado || estado !== guardaCurta.ler("estado")){
+      avisarConta("Autorização descartada: o estado devolvido não confere com o que saiu daqui.");
+      return;
+    }
+    var verificador = guardaCurta.ler("pkce");
+    if(!verificador){
+      avisarConta("O verificador desta autorização se perdeu (a aba foi reaberta?). Tente conectar de novo.");
+      return;
+    }
+
+    pedirToken(new URLSearchParams({
+      grant_type: "authorization_code",
+      code: codigo,
+      redirect_uri: enderecoRetorno(),
+      client_id: idCliente,
+      code_verifier: verificador
+    })).then(function(){
+      guardaCurta.tirar("pkce");
+      guardaCurta.tirar("estado");
+      avisarConta("Conta conectada. Sorteie uma combinação, clique em “Descobrir artistas” e depois em “Criar playlist na minha conta”.");
+    }).catch(function(e){
+      avisarConta("Não deu para concluir a autorização: " + e.message + ".");
+    }).then(ajustarConta);
+  })();
+
+  function apiSpotify(caminho, opcoes){
+    return tokenValido().then(function(token){
+      var o = opcoes || {};
+      var cabecalhos = { Authorization: "Bearer " + token };
+      if(o.body) cabecalhos["Content-Type"] = "application/json";
+      return fetch("https://api.spotify.com/v1" + caminho, {
+        method: o.method || "GET",
+        headers: cabecalhos,
+        body: o.body
+      });
+    }).then(function(r){
+      if(r.status === 204) return null;
+      return r.json().then(function(d){
+        if(!r.ok){
+          if(r.status === 401) throw new Error("a sessão perdeu a validade; conecte a conta de novo");
+          if(r.status === 403) throw new Error("sua conta não está autorizada neste app (apps novos começam em modo de desenvolvimento)");
+          throw new Error((d && d.error && d.error.message) || ("o Spotify respondeu " + r.status));
+        }
+        return d;
+      });
+    });
+  }
+
+  // pega as faixas mais tocadas de cada artista da lista atual
+  function faixasDosArtistas(nomes, mercado){
+    var uris = [];
+    var fila = nomes.slice(0, 8);
+    function proximo(){
+      if(!fila.length) return Promise.resolve(uris);
+      var nome = fila.shift();
+      return apiSpotify("/search?type=artist&limit=1&q=" + encodeURIComponent(nome))
+        .then(function(d){
+          var art = d && d.artists && d.artists.items && d.artists.items[0];
+          if(!art || !mesmoArtista(art.name, nome)) return null;   // melhor faltar do que entrar errado
+          return apiSpotify("/artists/" + art.id + "/top-tracks?market=" + encodeURIComponent(mercado));
+        })
+        .then(function(d){
+          var faixas = (d && d.tracks) || [];
+          faixas.slice(0, 3).forEach(function(f){ if(f && f.uri) uris.push(f.uri); });
+        })
+        .catch(function(){ /* um artista que falha nao derruba a playlist inteira */ })
+        .then(proximo);
+    }
+    return proximo();
+  }
+
+  function mostrarPlaylistCriada(lista, total){
+    caixaPlaylist.textContent = "";
+    var link = document.createElement("a");
+    link.className = "playlist-pronta";
+    link.href = (lista.external_urls && lista.external_urls.spotify) ||
+                ("https://open.spotify.com/playlist/" + lista.id);
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+
+    var nome = document.createElement("b");
+    nome.textContent = lista.name;
+    var pe = document.createElement("small");
+    pe.textContent = total + (total === 1 ? " faixa" : " faixas") +
+                     " \u00b7 playlist privada \u00b7 abrir no Spotify";
+    link.appendChild(nome);
+    link.appendChild(pe);
+    caixaPlaylist.appendChild(link);
+  }
+
+  function criarPlaylistNaConta(){
+    var q = consultaAtual();
+    if(!q) return;
+    if(!artistasAtuais.length){
+      avisarPlaylist("Clique antes em “Descobrir artistas”: a playlist é montada com os artistas que aparecerem ali.", true);
+      return;
+    }
+
+    btCriar.disabled = true;
+    btCriar.textContent = "Criando\u2026";
+    caixaPlaylist.textContent = "";
+    avisarPlaylist("Procurando as faixas desses artistas no Spotify\u2026");
+
+    var eu = null;
+    apiSpotify("/me")
+      .then(function(d){
+        eu = d;
+        return faixasDosArtistas(artistasAtuais, (d && d.country) || "BR");
+      })
+      .then(function(uris){
+        if(!uris.length) throw new Error("nenhum desses artistas apareceu no catálogo do Spotify");
+        return apiSpotify("/users/" + encodeURIComponent(eu.id) + "/playlists", {
+          method: "POST",
+          body: JSON.stringify({
+            name: q.estilo + " \u00d7 " + q.pais,
+            description: "Sintonizado na Sintonia dupla: " + q.estilo + " " + preposicao(q.pais) + ".",
+            "public": false
+          })
+        }).then(function(lista){
+          var lote = uris.slice(0, 100);
+          return apiSpotify("/playlists/" + lista.id + "/tracks", {
+            method: "POST",
+            body: JSON.stringify({ uris: lote })
+          }).then(function(){ return { lista: lista, total: lote.length }; });
+        });
+      })
+      .then(function(r){
+        mostrarPlaylistCriada(r.lista, r.total);
+        avisarPlaylist("");
+      })
+      .catch(function(e){
+        avisarPlaylist("Não deu para criar a playlist: " + e.message + ".", true);
+      })
+      .then(function(){
+        btCriar.disabled = false;
+        btCriar.textContent = "Criar playlist na minha conta";
+      });
+  }
+
+  btCriar.addEventListener("click", criarPlaylistNaConta);
+  ajustarConta();
 
   // ================= capas e prévias de 30 segundos =================
   var CHAVE_WORKER = "roleta-dupla:worker";
