@@ -11,6 +11,7 @@ dessa combinação, com capa de álbum, prévia de 30 segundos e links para ouvi
 | `manifest.webmanifest` | Torna o app instalável (nome, ícones, cores) |
 | `sw.js` | Service worker: página sempre pela rede, com cache de reserva para uso offline |
 | `worker.js` | **Opcional.** Cloudflare Worker que guarda as chaves do Spotify |
+| `DOCUMENTACAO.md` | Registro das decisões técnicas e do porquê de cada uma |
 | `icone.svg`, `icone-192.png`, `icone-512.png` | Ícones do app |
 
 > `worker.js` **não** vai para o GitHub Pages junto com os outros: ele é colado no
